@@ -1,0 +1,768 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Proyectos | Seguimiento
+{% endblock %}
+
+{% block actividades_active %}
+    active
+{% endblock %}
+
+{% block breadcrumb %}
+    Inicio / Proyectos
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
+    }
+
+    .page-title h1 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .page-title p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .project-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 11px;
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #dbeafe;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       RESUMEN
+    ========================================================= */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .summary-card {
+        background: #fff;
+        border: 1px solid #e5ebf3;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+    }
+
+    .summary-label {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+
+    .summary-value {
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 750;
+        margin-top: 5px;
+    }
+
+
+    /* =========================================================
+       PROYECTOS
+    ========================================================= */
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .project-card {
+        background: #fff;
+        border: 1px solid #e5ebf3;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+        overflow: hidden;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .project-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(15, 23, 42, .08);
+    }
+
+    .project-card-header {
+        padding: 17px 19px;
+        border-bottom: 1px solid #edf2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .project-code {
+        color: #2563eb;
+        font-size: 10px;
+        font-weight: 750;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        margin-bottom: 5px;
+    }
+
+    .project-name {
+        margin: 0;
+        color: #1e293b;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .project-description {
+        margin: 6px 0 0;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+
+    /* =========================================================
+       ESTADO
+    ========================================================= */
+
+    .project-status {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .status-planificado {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .status-en-ejecucion {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-suspendido {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-finalizado {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .status-cancelado {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+
+    /* =========================================================
+       DATOS
+    ========================================================= */
+
+    .project-card-body {
+        padding: 17px 19px;
+    }
+
+    .project-data {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px 18px;
+    }
+
+    .data-label {
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    .data-value {
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+
+    /* =========================================================
+       AVANCE
+    ========================================================= */
+
+    .project-progress {
+        margin-top: 17px;
+        padding-top: 15px;
+        border-top: 1px solid #edf2f7;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+
+    .progress-label {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .progress-value {
+        color: #1e293b;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .project-progress-bar {
+        width: 100%;
+        height: 7px;
+        background: #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .project-progress-fill {
+        width: 0;
+        height: 100%;
+        background: #2563eb;
+        border-radius: 20px;
+        transition: width .2s ease;
+    }
+
+
+    /* =========================================================
+       FOOTER CARD
+    ========================================================= */
+
+    .project-card-footer {
+        padding: 13px 19px;
+        background: #f8fafc;
+        border-top: 1px solid #edf2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .activity-count {
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    .activity-count strong {
+        color: #1e293b;
+    }
+
+    .btn-project {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 34px;
+        padding: 6px 11px;
+        border-radius: 7px;
+        background: #2563eb;
+        border: 1px solid #2563eb;
+        color: #fff;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    .btn-project:hover {
+        background: #1d4ed8;
+        color: #fff;
+    }
+
+
+    /* =========================================================
+       VACÍO
+    ========================================================= */
+
+    .empty-projects {
+        background: #fff;
+        border: 1px solid #e5ebf3;
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .empty-projects i {
+        display: block;
+        font-size: 40px;
+        margin-bottom: 10px;
+        color: #cbd5e1;
+    }
+
+    .empty-projects strong {
+        display: block;
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+
+    @media(max-width:1100px) {
+
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    @media(max-width:650px) {
+
+        .page-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .project-card-header {
+            flex-direction: column;
+        }
+
+        .project-data {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- =========================================================
+     ENCABEZADO
+========================================================= -->
+
+<div class="page-header">
+
+    <div class="page-title">
+
+        <h1>
+            Proyectos
+        </h1>
+
+        <p>
+            Seguimiento y control de actividades por proyecto.
+        </p>
+
+    </div>
+
+
+    <div class="project-count">
+
+        <i class="bi bi-folder2"></i>
+
+        {{ proyectos|length }}
+
+        proyecto{{ proyectos|length|pluralize }}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     RESUMEN
+========================================================= -->
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Proyectos activos
+        </div>
+
+        <div class="summary-value">
+            {{ proyectos|length }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Actividades
+        </div>
+
+        <div class="summary-value">
+            {{ total_actividades }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Cumplidas
+        </div>
+
+        <div class="summary-value">
+            {{ total_cumplidas }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Avance promedio
+        </div>
+
+        <div class="summary-value">
+            {{ avance_general|default:0|floatformat:0 }}%
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LISTA
+========================================================= -->
+
+{% if proyectos %}
+
+    <div class="projects-grid">
+
+        {% for proyecto in proyectos %}
+
+            <article class="project-card">
+
+                <div class="project-card-header">
+
+                    <div>
+
+                        <div class="project-code">
+                            {{ proyecto.codigo }}
+                        </div>
+
+                        <h2 class="project-name">
+                            {{ proyecto.nombre }}
+                        </h2>
+
+                        {% if proyecto.descripcion %}
+
+                            <p class="project-description">
+                                {{ proyecto.descripcion }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div>
+
+                        {% if proyecto.estado == "PLANIFICADO" %}
+
+                            <span class="project-status status-planificado">
+                                Planificado
+                            </span>
+
+                        {% elif proyecto.estado == "EN_EJECUCION" %}
+
+                            <span class="project-status status-en-ejecucion">
+                                En ejecución
+                            </span>
+
+                        {% elif proyecto.estado == "SUSPENDIDO" %}
+
+                            <span class="project-status status-suspendido">
+                                Suspendido
+                            </span>
+
+                        {% elif proyecto.estado == "FINALIZADO" %}
+
+                            <span class="project-status status-finalizado">
+                                Finalizado
+                            </span>
+
+                        {% elif proyecto.estado == "CANCELADO" %}
+
+                            <span class="project-status status-cancelado">
+                                Cancelado
+                            </span>
+
+                        {% else %}
+
+                            <span class="project-status status-planificado">
+                                {{ proyecto.get_estado_display }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="project-card-body">
+
+                    <div class="project-data">
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Coordinador técnico
+                            </div>
+
+                            <div class="data-value">
+
+                                {% if proyecto.coordinador_tecnico %}
+                                    {{ proyecto.coordinador_tecnico }}
+                                {% else %}
+                                    No asignado
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Actividades
+                            </div>
+
+                            <div class="data-value">
+                                {{ proyecto.total_actividades|default:0 }}
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Fecha de inicio
+                            </div>
+
+                            <div class="data-value">
+
+                                {% if proyecto.fecha_inicio %}
+                                    {{ proyecto.fecha_inicio|date:"d/m/Y" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Fecha de fin
+                            </div>
+
+                            <div class="data-value">
+
+                                {% if proyecto.fecha_fin %}
+                                    {{ proyecto.fecha_fin|date:"d/m/Y" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Contratista
+                            </div>
+
+                            <div class="data-value">
+                                {{ proyecto.contratista|default:"—" }}
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="data-label">
+                                Supervisor
+                            </div>
+
+                            <div class="data-value">
+                                {{ proyecto.supervisor|default:"—" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AVANCE -->
+
+                    <div class="project-progress">
+
+                        <div class="progress-header">
+
+                            <span class="progress-label">
+                                Avance promedio
+                            </span>
+
+                            <span class="progress-value">
+                                {{ proyecto.avance_promedio|default:0|floatformat:0 }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="project-progress-bar">
+
+                            <div
+                                class="project-progress-fill"
+                                data-width="{{ proyecto.avance_promedio|default:0 }}"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="project-card-footer">
+
+                    <div class="activity-count">
+
+                        <strong>
+                            {{ proyecto.total_actividades|default:0 }}
+                        </strong>
+
+                        actividad{{ proyecto.total_actividades|default:0|pluralize }}
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'monitoreo:proyecto_resumen' proyecto.pk %}"
+                        class="btn-project"
+                    >
+                        Ver proyecto
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+{% else %}
+
+    <div class="empty-projects">
+
+        <i class="bi bi-folder-x"></i>
+
+        <strong>
+            No hay proyectos activos
+        </strong>
+
+        <span>
+            No existen proyectos disponibles para mostrar.
+        </span>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    document
+        .querySelectorAll(
+            ".project-progress-fill[data-width]"
+        )
+        .forEach(function (bar) {
+
+            let value = parseFloat(
+                bar.dataset.width || "0"
+            );
+
+            if (isNaN(value)) {
+                value = 0;
+            }
+
+            value = Math.max(
+                0,
+                Math.min(100, value)
+            );
+
+            bar.style.width =
+                value + "%";
+
+        });
+
+});
+
+</script>
+
+{% endblock %}

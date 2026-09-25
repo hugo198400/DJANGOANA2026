@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Enlaces de interés{% endblock %}
+
+{% block enlaces_active %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    .enlaces-container {
+        max-width: 100%;
+    }
+
+    .nivel-0 {
+        border: 1px solid #d9dee5;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .nivel-0-header {
+        background: #1f4e78;
+        color: #ffffff;
+        padding: 15px 20px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .nivel-0-header:hover {
+        background: #173a5c;
+    }
+
+    .nivel-0-content {
+        padding: 18px;
+        background: #f8fafc;
+    }
+
+    .nivel-1 {
+        border: 1px solid #dce3eb;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .nivel-1:last-child {
+        margin-bottom: 0;
+    }
+
+    .nivel-1-header {
+        background: #eaf1f8;
+        color: #1f4e78;
+        padding: 12px 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .nivel-1-header:hover {
+        background: #dceaf6;
+    }
+
+    .nivel-1-content {
+        padding: 0;
+        background: #ffffff;
+    }
+
+    .tabla-enlaces {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    .tabla-enlaces th,
+    .tabla-enlaces td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e8edf2;
+        vertical-align: middle;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .tabla-enlaces th {
+        background: #f3f6f9;
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .tabla-enlaces td {
+        font-size: 1.2rem;
+        color: #343a40;
+    }
+
+    .tabla-enlaces tr:last-child td {
+        border-bottom: none;
+    }
+
+    .tabla-enlaces tr:hover td {
+        background: #f8fbff;
+    }
+
+    /*
+       Distribución fija de columnas:
+       1. Nombre del enlace: 34%
+       2. Enlace: 43%
+       3. Observaciones: 23%
+    */
+    .col-nombre {
+        width: 34%;
+    }
+
+    .col-url {
+        width: 13%;
+    }
+
+    .col-observaciones {
+        width: 53%;
+    }
+
+    .enlace-url {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #0d6efd;
+        text-decoration: none;
+        word-break: break-word;
+    }
+
+    .enlace-url:hover {
+        text-decoration: underline;
+    }
+
+    .sin-registros {
+        padding: 18px;
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+    }
+
+    .icono-nivel {
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    [aria-expanded="true"] .icono-nivel {
+        transform: rotate(90deg);
+    }
+
+    .buscador-enlaces {
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .nivel-0-content {
+            padding: 10px;
+        }
+
+        .tabla-enlaces {
+            min-width: 650px;
+        }
+
+        .nivel-1-content {
+            overflow-x: auto;
+        }
+
+        .nivel-0-header,
+        .nivel-1-header {
+            padding: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active" aria-current="page">
+        Enlaces de interés
+    </li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid enlaces-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Enlaces de interés</h2>
+            <p class="text-muted mb-0">
+                Consulta los enlaces organizados por categoría y grupo.
+            </p>
+        </div>
+    </div>
+
+    <div class="buscador-enlaces">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="bi bi-search"></i>
+            </span>
+            <input
+                type="text"
+                id="buscadorEnlaces"
+                class="form-control"
+                placeholder="Buscar categoría, grupo o enlace..."
+            >
+        </div>
+    </div>
+
+    <div id="contenedorEnlaces">
+
+        {% for categoria in categorias %}
+        <div class="nivel-0 bloque-enlace">
+
+            <div
+                class="nivel-0-header"
+                data-bs-toggle="collapse"
+                data-bs-target="#categoria-{{ categoria.id }}"
+                aria-expanded="true"
+                aria-controls="categoria-{{ categoria.id }}"
+            >
+                <span>
+                    <i class="bi bi-folder2-open me-2"></i>
+                    {{ categoria.nombre }}
+                </span>
+
+                <i class="bi bi-chevron-right icono-nivel"></i>
+            </div>
+
+            <div
+                id="categoria-{{ categoria.id }}"
+                class="collapse show nivel-0-content"
+            >
+
+                {% for grupo in categoria.grupos.all %}
+                <div class="nivel-1 bloque-grupo">
+
+                    <div
+                        class="nivel-1-header"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#grupo-{{ grupo.id }}"
+                        aria-expanded="true"
+                        aria-controls="grupo-{{ grupo.id }}"
+                    >
+                        <span>
+                            <i class="bi bi-folder me-2"></i>
+                            {{ grupo.titulo }}
+                        </span>
+
+                        <i class="bi bi-chevron-right icono-nivel"></i>
+                    </div>
+
+                    <div
+                        id="grupo-{{ grupo.id }}"
+                        class="collapse show nivel-1-content"
+                    >
+
+                        {% if grupo.enlaces.all %}
+                        <table class="tabla-enlaces">
+                            <thead>
+                                <tr>
+                                    <th class="col-nombre">
+                                        Registro / Enlace
+                                    </th>
+                                    <th class="col-url">
+                                        URL
+                                    </th>
+                                    <th class="col-observaciones">
+                                        Observaciones
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for enlace in grupo.enlaces.all %}
+                                <tr class="registro-enlace">
+                                    <td class="col-nombre">
+                                        <i class="bi bi-link-45deg me-1 text-secondary"></i>
+                                        {{ enlace.nombre }}
+                                    </td>
+
+                                    <td class="col-url">
+                                        <a
+                                            href="{{ enlace.url }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="enlace-url"
+                                            title="{{ enlace.url }}"
+                                        >
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                            <span>Abrir enlace</span>
+                                        </a>
+                                    </td>
+
+                                    <td class="col-observaciones">
+                                        {% if enlace.observaciones %}
+                                            {{ enlace.observaciones }}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% else %}
+                        <div class="sin-registros">
+                            No hay registros asociados a este grupo.
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                {% empty %}
+                <div class="sin-registros">
+                    No hay grupos registrados para esta categoría.
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="alert alert-info">
+            No hay categorías de enlaces registradas.
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buscador = document.getElementById("buscadorEnlaces");
+        const bloquesCategoria = document.querySelectorAll(".bloque-enlace");
+
+        buscador.addEventListener("input", function () {
+            const termino = this.value.toLowerCase().trim();
+
+            bloquesCategoria.forEach(function (categoria) {
+                const textoCategoria = categoria.textContent.toLowerCase();
+                const coincide = textoCategoria.includes(termino);
+
+                categoria.style.display = coincide ? "" : "none";
+
+                if (coincide && termino !== "") {
+                    const contenidoCategoria =
+                        categoria.querySelector(".nivel-0-content");
+
+                    if (contenidoCategoria) {
+                        contenidoCategoria.classList.add("show");
+                    }
+
+                    categoria
+                        .querySelectorAll(".nivel-1-content")
+                        .forEach(function (grupo) {
+                            grupo.classList.add("show");
+                        });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

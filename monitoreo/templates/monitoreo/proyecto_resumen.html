@@ -1,0 +1,1613 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    {{ proyecto.nombre }} | Monitoreo
+{% endblock %}
+
+{% block extra_css %}
+
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --secondary: #334155;
+            --success: #15803d;
+            --warning: #b45309;
+            --danger: #b91c1c;
+            --info: #0369a1;
+
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .header-inner {
+            max-width: 1600px;
+            margin: auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            min-width: 0;
+        }
+
+        .header-title .code {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.25;
+        }
+
+        .header-title p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #f8fafc;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* =========================================================
+           CONTENEDOR
+        ========================================================= */
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        /* =========================================================
+           TABS
+        ========================================================= */
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 11px 16px;
+            border-bottom: 3px solid transparent;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* =========================================================
+           KPI
+        ========================================================= */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .kpi {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .kpi-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        .kpi-value {
+            font-size: 25px;
+            font-weight: 750;
+        }
+
+        .kpi-sub {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           CARD
+        ========================================================= */
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 750;
+        }
+
+        .card-subtitle {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+
+        /* =========================================================
+           DATOS DEL PROYECTO
+        ========================================================= */
+
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
+            min-width: 0;
+        }
+
+        .info-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        /* =========================================================
+           FILTROS
+        ========================================================= */
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            padding: 15px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-control {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: #ffffff;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(15, 118, 110, .10);
+        }
+
+        /* =========================================================
+           FASE
+        ========================================================= */
+
+        .phase {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .phase:last-child {
+            margin-bottom: 0;
+        }
+
+        .phase-header {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .phase-name {
+            font-size: 14px;
+            font-weight: 750;
+        }
+
+        .phase-count {
+            font-size: 11px;
+            color: var(--muted);
+            background: #e2e8f0;
+            border-radius: 999px;
+            padding: 4px 9px;
+        }
+
+        /* =========================================================
+           TABLA DE ACTIVIDADES
+        ========================================================= */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .activity-table {
+            width: 100%;
+            min-width: 1350px;
+            border-collapse: collapse;
+        }
+
+        .activity-table th {
+            background: #ffffff;
+            color: #475569;
+            border-bottom: 1px solid var(--border);
+            padding: 11px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 750;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .activity-table td {
+            padding: 12px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: top;
+            font-size: 12px;
+        }
+
+        .activity-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .activity-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .activity-name {
+            min-width: 230px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .activity-description {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .legal {
+            min-width: 160px;
+            max-width: 220px;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .responsible {
+            min-width: 140px;
+        }
+
+        .control {
+            min-width: 160px;
+            max-width: 210px;
+            color: #475569;
+        }
+
+        .date {
+            white-space: nowrap;
+        }
+
+        /* =========================================================
+           ESTADOS
+        ========================================================= */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .status-pendiente {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .status-en-proceso {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-cumplida {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-vencida {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-suspendida {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelada {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* =========================================================
+           AVANCE
+        ========================================================= */
+
+        .progress-container {
+            min-width: 120px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .progress {
+            width: 100%;
+            height: 7px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            border-radius: inherit;
+            transition: width .2s ease;
+        }
+
+        /* =========================================================
+           OBSERVACIONES
+        ========================================================= */
+
+        .observation-input {
+            min-width: 180px;
+            min-height: 70px;
+            resize: vertical;
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           ACCIONES
+        ========================================================= */
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .btn-edit {
+            min-height: 32px;
+            padding: 0 10px;
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           ALERTAS
+        ========================================================= */
+
+        .alert {
+            padding: 13px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid;
+            font-size: 12px;
+        }
+
+        .alert:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .empty {
+            padding: 45px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 1100px) {
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .project-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header-inner {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+            }
+
+            .container {
+                padding: 14px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .project-info {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    {% endblock %}
+
+{% block content %}
+
+<header class="header">
+    <div class="header-inner">
+
+        <div class="header-title">
+
+            <div class="code">
+                {{ proyecto.codigo }}
+            </div>
+
+            <h1>
+                {{ proyecto.nombre }}
+            </h1>
+
+            {% if proyecto.descripcion %}
+                <p>
+                    {{ proyecto.descripcion }}
+                </p>
+            {% endif %}
+
+        </div>
+
+        <div class="header-actions">
+
+            <a href="{% url 'monitoreo:proyecto_lista' %}" class="btn">
+                ← Proyectos
+            </a>
+
+            <a
+                href="{% url 'monitoreo:actividad_crear' proyecto.pk %}"
+                class="btn btn-primary"
+            >
+                + Nueva actividad
+            </a>
+
+        </div>
+
+    </div>
+</header>
+
+
+<main class="container">
+
+    <!-- =========================================================
+         TABS
+    ========================================================== -->
+
+    <nav class="tabs">
+
+        <a href="#resumen" class="tab active">
+            Resumen
+        </a>
+
+        <a href="#matriz" class="tab">
+            Matriz de actividades
+        </a>
+
+        <a href="#alertas" class="tab">
+            Alertas
+        </a>
+
+    </nav>
+
+
+    <!-- =========================================================
+         KPI
+    ========================================================== -->
+
+    <section id="resumen">
+
+        <div class="kpi-grid">
+
+            <div class="kpi">
+                <div class="kpi-label">
+                    Total actividades
+                </div>
+
+                <div class="kpi-value">
+                    {{ total_actividades }}
+                </div>
+
+                <div class="kpi-sub">
+                    Registradas en el proyecto
+                </div>
+            </div>
+
+
+            <div class="kpi">
+                <div class="kpi-label">
+                    Pendientes
+                </div>
+
+                <div class="kpi-value">
+                    {{ total_pendientes }}
+                </div>
+
+                <div class="kpi-sub">
+                    Por iniciar
+                </div>
+            </div>
+
+
+            <div class="kpi">
+                <div class="kpi-label">
+                    En proceso
+                </div>
+
+                <div class="kpi-value">
+                    {{ total_en_proceso }}
+                </div>
+
+                <div class="kpi-sub">
+                    Actividades en ejecución
+                </div>
+            </div>
+
+
+            <div class="kpi">
+                <div class="kpi-label">
+                    Cumplidas
+                </div>
+
+                <div class="kpi-value">
+                    {{ total_cumplidas }}
+                </div>
+
+                <div class="kpi-sub">
+                    Actividades finalizadas
+                </div>
+            </div>
+
+
+            <div class="kpi">
+                <div class="kpi-label">
+                    Avance promedio
+                </div>
+
+                <div class="kpi-value">
+                    {{ avance_promedio|default:0|floatformat:0 }}%
+                </div>
+
+                <div class="kpi-sub">
+                    Avance de las actividades
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             INFORMACIÓN DEL PROYECTO
+        ====================================================== -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2 class="card-title">
+                        Información del proyecto
+                    </h2>
+
+                    <p class="card-subtitle">
+                        Datos generales registrados
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="project-info">
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Coordinador técnico
+                        </div>
+
+                        <div class="info-value">
+                            {% if proyecto.coordinador_tecnico %}
+                                {{ proyecto.coordinador_tecnico }}
+                            {% else %}
+                                No asignado
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Contratista
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.contratista|default:"—" }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Supervisor
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.supervisor|default:"—" }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Entidad
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.entidad_nombre|default:"—" }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Fecha de inicio
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.fecha_inicio|date:"d/m/Y"|default:"—" }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Fecha de fin
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.fecha_fin|date:"d/m/Y"|default:"—" }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Estado
+                        </div>
+
+                        <div class="info-value">
+                            {{ proyecto.get_estado_display }}
+                        </div>
+                    </div>
+
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            Monto
+                        </div>
+
+                        <div class="info-value">
+                            {% if proyecto.monto %}
+                                {{ proyecto.monto|floatformat:2 }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         MATRIZ
+    ========================================================== -->
+
+    <section id="matriz">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2 class="card-title">
+                        Matriz de actividades
+                    </h2>
+
+                    <p class="card-subtitle">
+                        Actividades agrupadas por fase
+                    </p>
+                </div>
+
+                <div>
+                    <strong>
+                        {{ total_actividades }}
+                    </strong>
+                    actividades
+                </div>
+
+            </div>
+
+
+            <!-- FILTROS -->
+
+            <form method="get" class="filters">
+
+                <input
+                    type="text"
+                    name="buscar"
+                    class="form-control"
+                    placeholder="Buscar actividad..."
+                    value="{{ buscar }}"
+                >
+
+
+                <select
+                    name="estado"
+                    class="form-control"
+                >
+
+                    <option value="">
+                        Todos los estados
+                    </option>
+
+                    {% for value, label in estados %}
+                        <option
+                            value="{{ value }}"
+                            {% if estado_filtro == value %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+
+                <select
+                    name="fase"
+                    class="form-control"
+                >
+
+                    <option value="">
+                        Todas las fases
+                    </option>
+
+                    {% for fase in fases %}
+                        <option
+                            value="{{ fase.pk }}"
+                            {% if fase_filtro == fase.pk|stringformat:"s" %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ fase.nombre }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Filtrar
+                </button>
+
+            </form>
+
+
+            <div class="card-body">
+
+                {% regroup actividades by fase as actividades_por_fase %}
+
+
+                {% for grupo in actividades_por_fase %}
+
+                    <!-- =================================================
+                         FASE
+                    ================================================== -->
+
+                    <div class="phase">
+
+                        <div class="phase-header">
+
+                            <div class="phase-name">
+
+                                {% if grupo.grouper %}
+                                    {{ grupo.grouper.nombre }}
+                                {% else %}
+                                    Sin fase
+                                {% endif %}
+
+                            </div>
+
+                            <div class="phase-count">
+                                {{ grupo.list|length }}
+                                actividad{{ grupo.list|length|pluralize }}
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             ACTIVIDADES DE LA FASE
+                        ================================================== -->
+
+                        <div class="table-wrapper">
+
+                            <table class="activity-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Actividad
+                                        </th>
+
+                                        <th>
+                                            Control
+                                        </th>
+
+                                        <th>
+                                            Responsable
+                                        </th>
+
+                                        <th>
+                                            Base legal
+                                        </th>
+
+                                        <th>
+                                            Inicio
+                                        </th>
+
+                                        <th>
+                                            Fecha límite
+                                        </th>
+
+                                        <th>
+                                            Avance
+                                        </th>
+
+                                        <th>
+                                            Estado
+                                        </th>
+
+                                        <th>
+                                            Observaciones
+                                        </th>
+
+                                        <th>
+                                            Acción
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {% for actividad in grupo.list %}
+
+                                        <tr
+                                            data-actividad-id="{{ actividad.pk }}"
+                                        >
+
+                                            <!-- ACTIVIDAD -->
+
+                                            <td>
+
+                                                <div class="activity-name">
+                                                    {{ actividad.nombre }}
+                                                </div>
+
+                                                {% if actividad.descripcion %}
+
+                                                    <div class="activity-description">
+                                                        {{ actividad.descripcion }}
+                                                    </div>
+
+                                                {% endif %}
+
+                                            </td>
+
+
+                                            <!-- CONTROL -->
+
+                                            <td>
+
+                                                <div class="control">
+                                                    {{ actividad.control }}
+                                                </div>
+
+                                            </td>
+
+
+                                            <!-- RESPONSABLE -->
+
+                                            <td>
+
+                                                <div class="responsible">
+
+                                                    {% if actividad.responsable %}
+
+                                                        {{ actividad.responsable }}
+
+                                                    {% else %}
+
+                                                        —
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </td>
+
+
+                                            <!-- BASE LEGAL -->
+
+                                            <td>
+
+                                                <div class="legal">
+
+                                                    {% if actividad.baselegal %}
+                                                        {{ actividad.baselegal }}
+                                                    {% else %}
+                                                        —
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </td>
+
+
+                                            <!-- INICIO -->
+
+                                            <td class="date">
+
+                                                {% if actividad.fecha_inicio %}
+                                                    {{ actividad.fecha_inicio|date:"d/m/Y" }}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+
+                                            </td>
+
+
+                                            <!-- FECHA FIN -->
+
+                                            <td class="date">
+
+                                                {% if actividad.fecha_fin %}
+                                                    {{ actividad.fecha_fin|date:"d/m/Y" }}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+
+                                            </td>
+
+
+                                            <!-- AVANCE -->
+
+                                            <td>
+
+                                                <div class="progress-container">
+
+                                                    <div class="progress-text">
+
+                                                        <span>
+                                                            Avance
+                                                        </span>
+
+                                                        <span>
+                                                            {{ actividad.porcentaje_avance|default:0|floatformat:0 }}%
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div class="progress">
+
+                                                        <div
+                                                            class="progress-bar"
+                                                            data-width="{{ actividad.porcentaje_avance|default:0 }}"
+                                                        ></div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </td>
+
+
+                                            <!-- ESTADO -->
+
+                                            <td>
+
+                                                <select
+                                                    class="form-control estado-select"
+                                                    data-id="{{ actividad.pk }}"
+                                                >
+
+                                                    {% for value, label in estados %}
+                                                        <option
+                                                            value="{{ value }}"
+                                                            {% if actividad.estado == value %}
+                                                                selected
+                                                            {% endif %}
+                                                        >
+                                                            {{ label }}
+                                                        </option>
+                                                    {% endfor %}
+
+                                                </select>
+
+                                            </td>
+
+
+                                            <!-- OBSERVACIONES -->
+
+                                            <td>
+
+                                                <textarea
+                                                    class="form-control observation-input observaciones-input"
+                                                    data-id="{{ actividad.pk }}"
+                                                    placeholder="Registrar observación..."
+                                                >{{ actividad.observaciones|default:"" }}</textarea>
+
+                                            </td>
+
+
+                                            <!-- ACCIÓN -->
+
+                                            <td class="actions">
+
+                                                <a
+                                                    href="{% url 'monitoreo:actividad_editar' actividad.pk %}"
+                                                    class="btn btn-edit"
+                                                >
+                                                    Editar
+                                                </a>
+
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="empty">
+
+                        <strong>
+                            No hay actividades para mostrar.
+                        </strong>
+
+                        <div style="margin-top: 6px;">
+                            {% if buscar or estado_filtro or fase_filtro %}
+                                Prueba eliminando los filtros aplicados.
+                            {% else %}
+                                Este proyecto todavía no tiene actividades registradas.
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         ALERTAS
+    ========================================================== -->
+
+    <section id="alertas">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2 class="card-title">
+                        Alertas
+                    </h2>
+
+                    <p class="card-subtitle">
+                        Actividades que requieren atención
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="card-body">
+
+                {% if vencidas_fecha %}
+
+                    {% for actividad in vencidas_fecha %}
+
+                        <div class="alert alert-danger">
+
+                            <strong>
+                                Actividad vencida:
+                            </strong>
+
+                            {{ actividad.nombre }}
+
+                            {% if actividad.fecha_fin %}
+                                — fecha límite:
+                                {{ actividad.fecha_fin|date:"d/m/Y" }}
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="alert alert-warning">
+
+                        No se encontraron actividades vencidas por fecha.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * ============================================================
+     * BARRAS DE AVANCE
+     * ============================================================
+     */
+
+    document.querySelectorAll(".progress-bar[data-width]").forEach(function (bar) {
+
+        let value = parseFloat(bar.dataset.width || "0");
+
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        value = Math.max(0, Math.min(100, value));
+
+        bar.style.width = value + "%";
+
+    });
+
+
+    /*
+     * ============================================================
+     * CSRF
+     * ============================================================
+     */
+
+    function getCookie(name) {
+
+        let cookieValue = null;
+
+        if (document.cookie && document.cookie !== "") {
+
+            const cookies = document.cookie.split(";");
+
+            for (let i = 0; i < cookies.length; i++) {
+
+                const cookie = cookies[i].trim();
+
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+
+                    cookieValue = decodeURIComponent(
+                        cookie.substring(name.length + 1)
+                    );
+
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+
+
+    const csrftoken = getCookie("csrftoken");
+
+
+    /*
+     * ============================================================
+     * GUARDAR ESTADO
+     * ============================================================
+     */
+
+    document.querySelectorAll(".estado-select").forEach(function (select) {
+
+        select.addEventListener("change", function () {
+
+            const actividadId = this.dataset.id;
+
+            const row = this.closest("tr");
+
+            const observaciones =
+                row.querySelector(".observaciones-input")?.value || "";
+
+
+            fetch(
+                "{% url 'monitoreo:actividad_estado' 0 %}"
+                    .replace("/0/", "/" + actividadId + "/"),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+
+                    body: JSON.stringify({
+                        estado: this.value,
+                        observaciones: observaciones
+                    })
+                }
+            )
+            .then(function (response) {
+
+                if (!response.ok) {
+                    throw new Error("Error al guardar");
+                }
+
+                return response.json();
+
+            })
+            .then(function (data) {
+
+                if (!data.ok) {
+                    throw new Error(
+                        data.error || "No se pudo guardar"
+                    );
+                }
+
+                mostrarMensaje("Estado actualizado correctamente.");
+
+            })
+            .catch(function (error) {
+
+                console.error(error);
+
+                alert(
+                    "No se pudo guardar el estado de la actividad."
+                );
+
+            });
+
+        });
+
+    });
+
+
+    /*
+     * ============================================================
+     * GUARDAR OBSERVACIONES
+     * ============================================================
+     */
+
+    document.querySelectorAll(".observaciones-input").forEach(function (textarea) {
+
+        textarea.addEventListener("blur", function () {
+
+            const actividadId = this.dataset.id;
+
+            const row = this.closest("tr");
+
+            const estado =
+                row.querySelector(".estado-select")?.value || "";
+
+            const observaciones = this.value;
+
+
+            fetch(
+                "{% url 'monitoreo:actividad_estado' 0 %}"
+                    .replace("/0/", "/" + actividadId + "/"),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+
+                    body: JSON.stringify({
+                        estado: estado,
+                        observaciones: observaciones
+                    })
+                }
+            )
+            .then(function (response) {
+
+                if (!response.ok) {
+                    throw new Error("Error al guardar");
+                }
+
+                return response.json();
+
+            })
+            .then(function (data) {
+
+                if (!data.ok) {
+                    throw new Error(
+                        data.error || "No se pudo guardar"
+                    );
+                }
+
+                mostrarMensaje("Observación guardada.");
+
+            })
+            .catch(function (error) {
+
+                console.error(error);
+
+                alert(
+                    "No se pudo guardar la observación."
+                );
+
+            });
+
+        });
+
+    });
+
+
+    /*
+     * ============================================================
+     * MENSAJE DE GUARDADO
+     * ============================================================
+     */
+
+    function mostrarMensaje(texto) {
+
+        let mensaje = document.getElementById("save-message");
+
+        if (!mensaje) {
+
+            mensaje = document.createElement("div");
+
+            mensaje.id = "save-message";
+
+            mensaje.style.position = "fixed";
+            mensaje.style.right = "20px";
+            mensaje.style.bottom = "20px";
+            mensaje.style.zIndex = "9999";
+            mensaje.style.padding = "11px 15px";
+            mensaje.style.background = "#15803d";
+            mensaje.style.color = "#ffffff";
+            mensaje.style.borderRadius = "8px";
+            mensaje.style.fontSize = "12px";
+            mensaje.style.fontWeight = "600";
+            mensaje.style.boxShadow =
+                "0 4px 12px rgba(0,0,0,.15)";
+
+            document.body.appendChild(mensaje);
+        }
+
+        mensaje.textContent = texto;
+        mensaje.style.display = "block";
+
+        clearTimeout(window.saveMessageTimer);
+
+        window.saveMessageTimer = setTimeout(function () {
+
+            mensaje.style.display = "none";
+
+        }, 1800);
+
+    }
+
+});
+</script>
+
+{% endblock %}
