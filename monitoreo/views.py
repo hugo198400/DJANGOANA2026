@@ -126,6 +126,57 @@ def proyecto_resumen(request, pk):
             fase_id=fase_id
         )
 
+     # -----------------------------
+    # Actividades para los KPI
+    # -----------------------------
+
+    todas_las_actividades = list(
+        proyecto.actividades.all()
+    )
+
+    total_actividades = len(todas_las_actividades)
+
+    total_pendientes = sum(
+        1
+        for actividad in todas_las_actividades
+        if actividad.estado == Actividad.Estado.PENDIENTE
+    )
+
+    total_en_proceso = sum(
+        1
+        for actividad in todas_las_actividades
+        if actividad.estado == Actividad.Estado.EN_PROCESO
+    )
+
+    total_cumplidas = sum(
+        1
+        for actividad in todas_las_actividades
+        if actividad.estado == Actividad.Estado.CUMPLIDA
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # ---------------------------------------------------------
     # Estadísticas
     # ---------------------------------------------------------
@@ -224,6 +275,15 @@ def proyecto_resumen(request, pk):
         "fase_filtro": fase_id,
 
         "hoy": hoy,
+
+
+
+        # KPI
+        "total_actividades": total_actividades,
+        "total_pendientes": total_pendientes,
+        "total_en_proceso": total_en_proceso,
+        "total_cumplidas": total_cumplidas,
+        "avance_promedio": avance_promedio,
 
         # estadísticas
         "total": total,
