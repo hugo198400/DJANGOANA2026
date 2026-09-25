@@ -243,17 +243,7 @@ def proyecto_resumen(request, pk):
 
 
 
-    print("PROYECTO:", proyecto.pk, proyecto.nombre)
-    print("ACTIVIDADES:", proyecto.actividades.count())
-
-    for actividad in proyecto.actividades.all():
-        print(
-            actividad.pk,
-            actividad.nombre,
-            "PROYECTO:", actividad.proyecto_id,
-            "FASE:", actividad.fase_id,
-        )
-
+    
     return render(
         request,
         "monitoreo/proyecto_resumen.html",
