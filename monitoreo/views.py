@@ -543,3 +543,9 @@ def actividad_avance(request, pk):
             ),
         }
     )
+
+
+from django.shortcuts import render
+
+def powerbi_seguimiento(request):
+    return render(request, 'seguimiento.html')

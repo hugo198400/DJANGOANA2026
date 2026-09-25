@@ -43,4 +43,9 @@ urlpatterns = [
         views.actividad_avance,
         name="actividad_avance",
     ),
+    path('seguimiento-ptto/', views.powerbi_seguimiento, name='powerbi_seguimiento'),
+
+
+
+
 ]

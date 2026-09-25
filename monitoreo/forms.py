@@ -21,6 +21,7 @@ class ActividadForm(forms.ModelForm):
             "estado",
             "observaciones",
             "orden",
+            "link",
         ]
 
         widgets = {
@@ -106,6 +107,12 @@ class ActividadForm(forms.ModelForm):
                     "min": "0",
                 }
             ),
+
+            "link": forms.URLInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enlace relacionado (opcional)",
+                }),
         }
 
     def __init__(self, *args, proyecto=None, **kwargs):

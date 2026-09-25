@@ -125,6 +125,7 @@ class Proyecto(models.Model):
         auto_now=True,
     )
 
+
     class Meta:
         verbose_name = "Proyecto"
         verbose_name_plural = "Proyectos"
@@ -265,6 +266,9 @@ class Actividad(models.Model):
         choices=Estado.choices,
         default=Estado.PENDIENTE,
     )
+
+    link = models.URLField(
+        blank=True,)
 
     observaciones = models.TextField(
         blank=True,

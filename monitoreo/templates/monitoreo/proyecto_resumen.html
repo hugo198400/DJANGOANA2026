@@ -596,6 +596,32 @@
                 grid-template-columns: 1fr;
             }
         }
+
+
+
+
+        .btn-descargar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #198754;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-descargar:hover {
+            background: #157347;
+        }
+
+        .btn-descargar span {
+            font-size: 20px;
+            line-height: 1;
+        }
     </style>
 
     {% endblock %}
@@ -1038,6 +1064,7 @@
                                         <th>
                                             Base legal
                                         </th>
+                                        
 
                                         <th>
                                             Inicio
@@ -1134,7 +1161,14 @@
                                                 <div class="legal">
 
                                                     {% if actividad.baselegal %}
-                                                        {{ actividad.baselegal }}
+                                                    {{ actividad.baselegal }}
+                                                    {% if actividad.link %}
+
+
+                                                        <a href="{{ actividad.link }}" download class="btn-descargar">
+                                                            ↓ Descargar
+                                                        </a>
+                                                        {% endif %}
                                                     {% else %}
                                                         —
                                                     {% endif %}
@@ -1143,7 +1177,7 @@
 
                                             </td>
 
-
+                                           
                                             <!-- INICIO -->
 
                                             <td class="date">
