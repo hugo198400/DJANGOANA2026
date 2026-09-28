@@ -546,6 +546,15 @@ def actividad_avance(request, pk):
 
 
 from django.shortcuts import render
-
+@login_required
 def powerbi_seguimiento(request):
     return render(request, 'seguimiento.html')
+
+@login_required
+def powerbi_mapa(request):
+    return render(request, 'Mapabi.html')
+
+@login_required
+def Panel_fotografico(request):
+    return render(request, 'Panel.html')
+

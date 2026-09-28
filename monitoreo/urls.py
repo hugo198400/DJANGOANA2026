@@ -44,7 +44,8 @@ urlpatterns = [
         name="actividad_avance",
     ),
     path('seguimiento-ptto/', views.powerbi_seguimiento, name='powerbi_seguimiento'),
-
+    path('mapa-quebradas/', views.powerbi_mapa, name='powerbi_mapa'),
+    path('panel-fotografico/', views.Panel_fotografico, name='Panel_fotografico')
 
 
 

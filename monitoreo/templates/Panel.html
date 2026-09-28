@@ -1,0 +1,2096 @@
+```html
+{% extends 'base.html' %} 
+    
+    {% load static %} 
+    {% block title %} Panel Fotográfico {% endblock %} 
+        
+        
+    {% block extra_css %}
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            background: #f4f6f9;
+
+            color: #1f2937;
+        }
+
+
+        /* =========================================
+           CABECERA
+        ========================================= */
+
+        .header {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #1e40af
+                );
+
+            color: white;
+
+            padding: 28px 35px;
+
+            box-shadow:
+                0 3px 10px rgba(0,0,0,.15);
+        }
+
+
+        .header-content {
+
+            max-width: 1500px;
+
+            margin: auto;
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            font-size: 28px;
+
+            font-weight: 600;
+        }
+
+
+        .header p {
+
+            margin:
+                6px
+                0
+                0;
+
+            opacity: .85;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           CONTENEDOR
+        ========================================= */
+
+        .container {
+
+            max-width: 1500px;
+
+            margin: auto;
+
+            padding: 25px;
+        }
+
+
+        /* =========================================
+           FILTROS
+        ========================================= */
+
+        .filters {
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr
+                1fr
+                auto;
+
+            gap: 15px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(0,0,0,.06);
+        }
+
+
+        .filter-group {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+
+        .filter-group label {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #475569;
+        }
+
+
+        select {
+
+            width: 100%;
+
+            padding: 11px 12px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            background: white;
+
+            font-size: 14px;
+
+            outline: none;
+
+            cursor: pointer;
+        }
+
+
+        select:focus {
+
+            border-color: #2563eb;
+        }
+
+
+        .btn {
+
+            border: none;
+
+            border-radius: 8px;
+
+            padding:
+                11px
+                18px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition: .2s;
+        }
+
+
+        .btn-limpiar {
+
+            background: #334155;
+
+            color: white;
+
+            align-self: end;
+        }
+
+
+        .btn-limpiar:hover {
+
+            background: #1e293b;
+        }
+
+
+        .btn-actualizar {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        .btn-actualizar:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* =========================================
+           BARRA SUPERIOR
+        ========================================= */
+
+        .toolbar {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 18px;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .toolbar h2 {
+
+            margin: 0;
+
+            font-size: 19px;
+        }
+
+
+        .toolbar-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .counter {
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
+
+            padding:
+                7px
+                14px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           GALERÍA
+        ========================================= */
+
+        .gallery {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(280px, 1fr)
+                );
+
+            gap: 20px;
+        }
+
+
+        /* =========================================
+           TARJETA
+        ========================================= */
+
+        .card {
+
+            background: white;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 4px 12px
+                rgba(0,0,0,.07);
+
+            transition:
+                transform .2s,
+                box-shadow .2s;
+        }
+
+
+        .card:hover {
+
+            transform:
+                translateY(-4px);
+
+            box-shadow:
+                0 10px 25px
+                rgba(0,0,0,.13);
+        }
+
+
+        /* =========================================
+           IMAGEN
+        ========================================= */
+
+        .image-container {
+
+            width: 100%;
+
+            height: 230px;
+
+            background:
+                #e5e7eb;
+
+            overflow: hidden;
+
+            cursor: pointer;
+
+            position: relative;
+        }
+
+
+        .image-container img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            transition:
+                transform .3s;
+        }
+
+
+        .card:hover
+        .image-container img {
+
+            transform:
+                scale(1.04);
+        }
+
+
+        /* =========================================
+           INFORMACIÓN
+        ========================================= */
+
+        .info {
+
+            padding: 15px;
+        }
+
+
+        .date {
+
+            font-size: 13px;
+
+            color: #64748b;
+
+            margin-bottom: 8px;
+        }
+
+
+        .monitor {
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            margin-bottom: 8px;
+        }
+
+
+        .frente {
+
+            display: inline-block;
+
+            background:
+                #eef2ff;
+
+            color:
+                #4338ca;
+
+            padding:
+                5px
+                10px;
+
+            border-radius:
+                20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           BOTÓN VER
+        ========================================= */
+
+        .ver-foto {
+
+            position: absolute;
+
+            right: 12px;
+
+            bottom: 12px;
+
+            background:
+                rgba(0,0,0,.65);
+
+            color: white;
+
+            border: none;
+
+            border-radius: 20px;
+
+            padding:
+                6px
+                10px;
+
+            font-size: 12px;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================================
+           SIN RESULTADOS
+        ========================================= */
+
+        .empty {
+
+            display: none;
+
+            text-align: center;
+
+            padding: 70px 20px;
+
+            color: #64748b;
+        }
+
+
+        .empty-icon {
+
+            font-size: 50px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .empty h3 {
+
+            margin:
+                5px
+                0
+                8px;
+        }
+
+
+        /* =========================================
+           LOADING
+        ========================================= */
+
+        .loading {
+
+            text-align: center;
+
+            padding: 70px;
+
+            color: #64748b;
+        }
+
+
+        .spinner {
+
+            width: 42px;
+
+            height: 42px;
+
+            border:
+                4px solid #e5e7eb;
+
+            border-top-color:
+                #2563eb;
+
+            border-radius: 50%;
+
+            animation:
+                spin 1s linear infinite;
+
+            margin:
+                0
+                auto
+                15px;
+        }
+
+
+        @keyframes spin {
+
+            to {
+                transform:
+                    rotate(360deg);
+            }
+
+        }
+
+
+        /* =========================================
+           ERROR DE IMAGEN
+        ========================================= */
+
+        .image-error {
+
+            width: 100%;
+
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-direction: column;
+
+            color: #64748b;
+
+            background:
+                #e2e8f0;
+
+            text-align: center;
+
+            padding: 20px;
+        }
+
+
+        .image-error-icon {
+
+            font-size: 40px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .image-error small {
+
+            font-size: 11px;
+
+            max-width: 90%;
+
+            word-break: break-word;
+        }
+
+
+        /* =========================================
+           MODAL
+        ========================================= */
+
+        .modal {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(0,0,0,.90);
+
+            z-index: 9999;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+        }
+
+
+        .modal.active {
+
+            display: flex;
+        }
+
+
+        .modal-content {
+
+            position: relative;
+
+            max-width: 1200px;
+
+            max-height: 92vh;
+
+            width: auto;
+        }
+
+
+        .modal img {
+
+            max-width: 100%;
+
+            max-height: 82vh;
+
+            border-radius: 8px;
+
+            display: block;
+
+            margin: auto;
+        }
+
+
+        .close {
+
+            position: absolute;
+
+            right: -15px;
+
+            top: -15px;
+
+            width: 40px;
+
+            height: 40px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: white;
+
+            color: #111827;
+
+            font-size: 24px;
+
+            cursor: pointer;
+
+            z-index: 10;
+        }
+
+
+        .modal-info {
+
+            background:
+                rgba(0,0,0,.65);
+
+            color: white;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            margin-top: 10px;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media(max-width: 900px) {
+
+            .filters {
+
+                grid-template-columns:
+                    1fr
+                    1fr;
+            }
+
+        }
+
+
+        @media(max-width: 600px) {
+
+            .filters {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .gallery {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .header {
+
+                padding:
+                    22px;
+            }
+
+
+            .container {
+
+                padding:
+                    15px;
+            }
+
+        }
+
+    </style>
+
+{% endblock %} 
+
+{% block content %}
+
+
+<!-- =========================================
+     CABECERA
+========================================= -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <h1>
+            📷 Panel Fotográfico
+        </h1>
+
+        <p>
+            Registro y seguimiento fotográfico
+        </p>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- =========================================
+         FILTROS
+    ========================================= -->
+
+    <section class="filters">
+
+
+        <div class="filter-group">
+
+            <label>
+                📅 Fecha
+            </label>
+
+            <select id="fecha">
+
+                <option value="">
+                    Todas las fechas
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <label>
+                👤 Monitor
+            </label>
+
+            <select id="monitor">
+
+                <option value="">
+                    Todos los monitores
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <label>
+                📍 Frente
+            </label>
+
+            <select id="frente">
+
+                <option value="">
+                    Todos los frentes
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div
+            style="
+                display:flex;
+                gap:8px;
+                align-items:end;
+            "
+        >
+
+            <button
+                class="btn btn-limpiar"
+                onclick="limpiarFiltros()"
+            >
+                Limpiar
+            </button>
+
+            <button
+                class="btn btn-actualizar"
+                onclick="cargarDatos()"
+            >
+                🔄 Actualizar
+            </button>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =========================================
+         BARRA RESUMEN
+    ========================================= -->
+
+    <div class="toolbar">
+
+        <h2>
+            Fotografías registradas
+        </h2>
+
+
+        <div class="toolbar-right">
+
+            <span
+                id="contador"
+                class="counter"
+            >
+                0 fotografías
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         LOADING
+    ========================================= -->
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <div>
+            Cargando fotografías...
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         GALERÍA
+    ========================================= -->
+
+    <section
+        id="gallery"
+        class="gallery"
+    ></section>
+
+
+    <!-- =========================================
+         SIN RESULTADOS
+    ========================================= -->
+
+    <div
+        id="empty"
+        class="empty"
+    >
+
+        <div class="empty-icon">
+            📷
+        </div>
+
+        <h3>
+            No se encontraron fotografías
+        </h3>
+
+        <p>
+            Modifica los filtros para buscar
+            otras fotografías.
+        </p>
+
+    </div>
+
+
+</main>
+
+
+<!-- =========================================
+     MODAL
+========================================= -->
+
+<div
+    id="modal"
+    class="modal"
+    onclick="cerrarModal()"
+>
+
+    <div
+        class="modal-content"
+        onclick="event.stopPropagation()"
+    >
+
+        <button
+            class="close"
+            onclick="cerrarModal()"
+        >
+            ×
+        </button>
+
+
+        <img
+            id="modalImage"
+            src=""
+            alt="Fotografía"
+        >
+
+
+        <div
+            id="modalInfo"
+            class="modal-info"
+        ></div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   CONFIGURACIÓN
+========================================================= */
+
+
+/*
+    ID DE TU GOOGLE SHEET
+
+    El código utiliza la PRIMERA PESTAÑA
+    del Google Sheet.
+*/
+
+const SHEET_ID =
+    "1VtmifYepI6fa4UfhhSSlWkg0OpB6clgYmpPMq0x-OGc";
+
+
+/*
+    URL DEL GOOGLE SHEET COMO CSV
+
+    No ponemos el nombre de la hoja para
+    utilizar la primera pestaña.
+*/
+
+const SHEET_URL =
+    `https://docs.google.com/spreadsheets/d/1VtmifYepI6fa4UfhhSSlWkg0OpB6clgYmpPMq0x-OGc/gviz/tq?tqx=out:csv`;
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let datos = [];
+
+
+/* =========================================================
+   CARGAR DATOS
+========================================================= */
+
+async function cargarDatos() {
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+
+    const gallery =
+        document.getElementById(
+            "gallery"
+        );
+
+
+    loading.style.display =
+        "block";
+
+
+    gallery.innerHTML =
+        "";
+
+
+    try {
+
+        const respuesta =
+            await fetch(
+                SHEET_URL +
+                "&t=" +
+                Date.now()
+            );
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "No se pudo acceder al Google Sheet."
+            );
+
+        }
+
+
+        const csv =
+            await respuesta.text();
+
+
+        console.log(
+            "CSV recibido:",
+            csv
+        );
+
+
+        datos =
+            convertirCSV(csv);
+
+
+        console.log(
+            "Registros:",
+            datos
+        );
+
+
+        llenarFiltros();
+
+
+        mostrarGaleria(
+            datos
+        );
+
+
+        loading.style.display =
+            "none";
+
+
+    }
+    catch(error) {
+
+        console.error(
+            "Error:",
+            error
+        );
+
+
+        loading.innerHTML = `
+
+            <div
+                style="
+                    color:#b91c1c;
+                    font-weight:600;
+                "
+            >
+                ⚠️ No se pudieron cargar
+                los datos.
+            </div>
+
+            <div
+                style="
+                    margin-top:10px;
+                    font-size:13px;
+                "
+            >
+                Verifica que el Google Sheet
+                esté publicado en la web.
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   PARSER CSV
+========================================================= */
+
+function parseCSVLine(line) {
+
+    const resultado = [];
+
+    let actual = "";
+
+    let dentroComillas =
+        false;
+
+
+    for (
+        let i = 0;
+        i < line.length;
+        i++
+    ) {
+
+        const caracter =
+            line[i];
+
+
+        if (
+            caracter === '"' &&
+            line[i + 1] === '"'
+        ) {
+
+            actual += '"';
+
+            i++;
+
+        }
+
+        else if (
+            caracter === '"'
+        ) {
+
+            dentroComillas =
+                !dentroComillas;
+
+        }
+
+        else if (
+            caracter === "," &&
+            !dentroComillas
+        ) {
+
+            resultado.push(
+                actual
+            );
+
+            actual = "";
+
+        }
+
+        else {
+
+            actual +=
+                caracter;
+
+        }
+
+    }
+
+
+    resultado.push(
+        actual
+    );
+
+
+    return resultado;
+
+}
+
+
+/* =========================================================
+   CONVERTIR CSV
+========================================================= */
+
+function convertirCSV(csv) {
+
+    const filas =
+        csv
+        .trim()
+        .split(/\r?\n/);
+
+
+    if (
+        filas.length < 2
+    ) {
+
+        return [];
+
+    }
+
+
+    const encabezados =
+        parseCSVLine(
+            filas[0]
+        )
+        .map(
+            x =>
+                normalizarNombreColumna(
+                    x
+                )
+        );
+
+
+    console.log(
+        "Columnas encontradas:",
+        encabezados
+    );
+
+
+    return filas
+        .slice(1)
+        .map(
+            fila => {
+
+                const valores =
+                    parseCSVLine(
+                        fila
+                    );
+
+
+                const objeto = {};
+
+
+                encabezados.forEach(
+                    (
+                        encabezado,
+                        index
+                    ) => {
+
+                        objeto[
+                            encabezado
+                        ] =
+                            valores[index]
+                            ?
+                            valores[index]
+                                .trim()
+                            :
+                            "";
+
+                    }
+                );
+
+
+                return objeto;
+
+            }
+        )
+        .filter(
+            fila =>
+                fila.link
+        );
+
+}
+
+
+/* =========================================================
+   NORMALIZAR COLUMNAS
+========================================================= */
+
+function normalizarNombreColumna(
+    nombre
+) {
+
+    return String(nombre)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /\s+/g,
+            "_"
+        );
+
+}
+
+
+/*
+    Ejemplos:
+
+    "Fecha"      → fecha
+    "Link"       → link
+    "Monitor"    → monitor
+    "Frente"     → frente
+
+    "Fecha de foto" → fecha_de_foto
+*/
+
+
+/* =========================================================
+   OBTENER VALORES
+========================================================= */
+
+function obtenerValores(
+    campo
+) {
+
+    return [
+        ...new Set(
+
+            datos
+            .map(
+                item =>
+                    item[campo]
+            )
+            .filter(
+                valor =>
+                    valor &&
+                    valor.trim() !== ""
+            )
+
+        )
+    ]
+    .sort(
+        (a,b) =>
+            a.localeCompare(
+                b,
+                "es",
+                {
+                    numeric: true
+                }
+            )
+    );
+
+}
+
+
+/* =========================================================
+   LLENAR FILTROS
+========================================================= */
+
+function llenarFiltros() {
+
+    llenarSelect(
+        "fecha",
+        obtenerValores(
+            "fecha"
+        )
+    );
+
+
+    llenarSelect(
+        "monitor",
+        obtenerValores(
+            "monitor"
+        )
+    );
+
+
+    llenarSelect(
+        "frente",
+        obtenerValores(
+            "frente"
+        )
+    );
+
+}
+
+
+/* =========================================================
+   LLENAR SELECT
+========================================================= */
+
+function llenarSelect(
+    id,
+    valores
+) {
+
+    const select =
+        document.getElementById(
+            id
+        );
+
+
+    const textoInicial =
+        select.options[0]
+            .textContent;
+
+
+    select.innerHTML = "";
+
+
+    const primera =
+        document.createElement(
+            "option"
+        );
+
+
+    primera.value = "";
+
+    primera.textContent =
+        textoInicial;
+
+
+    select.appendChild(
+        primera
+    );
+
+
+    valores.forEach(
+        valor => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                valor;
+
+
+            option.textContent =
+                valor;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CONVERTIR LINK DE GOOGLE DRIVE
+========================================================= */
+
+function convertirLinkImagen(
+    url
+) {
+
+    if (!url) {
+
+        return "";
+
+    }
+
+
+    url =
+        url.trim();
+
+
+    /*
+        FORMATO:
+
+        https://drive.google.com/file/d/ID/view
+    */
+
+    let match =
+        url.match(
+            /drive\.google\.com\/file\/d\/([^/?]+)/i
+        );
+
+
+    if (match) {
+
+        const id =
+            match[1];
+
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(id) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    /*
+        FORMATO:
+
+        https://drive.google.com/open?id=ID
+    */
+
+    match =
+        url.match(
+            /drive\.google\.com\/open\?id=([^&]+)/i
+        );
+
+
+    if (match) {
+
+        const id =
+            match[1];
+
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(id) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    /*
+        FORMATO:
+
+        https://drive.google.com/uc?id=ID
+    */
+
+    match =
+        url.match(
+            /drive\.google\.com\/uc\?.*id=([^&]+)/i
+        );
+
+
+    if (match) {
+
+        const id =
+            match[1];
+
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(id) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    /*
+        Si no es Google Drive,
+        suponemos que es una URL
+        directa a la imagen.
+    */
+
+    return url;
+
+}
+
+
+/* =========================================================
+   MOSTRAR GALERÍA
+========================================================= */
+
+function mostrarGaleria(
+    registros
+) {
+
+    const gallery =
+        document.getElementById(
+            "gallery"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "empty"
+        );
+
+
+    gallery.innerHTML =
+        "";
+
+
+    document
+        .getElementById(
+            "contador"
+        )
+        .textContent =
+            `${registros.length} fotografía${
+                registros.length !== 1
+                ? "s"
+                : ""
+            }`;
+
+
+    if (
+        registros.length === 0
+    ) {
+
+        empty.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    empty.style.display =
+        "none";
+
+
+    registros.forEach(
+        registro => {
+
+            const linkOriginal =
+                registro.link;
+
+
+            const linkImagen =
+                convertirLinkImagen(
+                    linkOriginal
+                );
+
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "card";
+
+
+            card.innerHTML = `
+
+                <div
+                    class="image-container"
+                    onclick="abrirModal(
+                        '${escaparAtributo(
+                            linkImagen
+                        )}',
+                        '${escaparHTML(
+                            registro.fecha ||
+                            ''
+                        )}',
+                        '${escaparHTML(
+                            registro.monitor ||
+                            ''
+                        )}',
+                        '${escaparHTML(
+                            registro.frente ||
+                            ''
+                        )}'
+                    )"
+                >
+
+                    <img
+                        src="${escaparAtributo(
+                            linkImagen
+                        )}"
+                        alt="Fotografía"
+                        loading="lazy"
+                        onerror="mostrarErrorImagen(this)"
+                    >
+
+                    <span
+                        class="ver-foto"
+                    >
+                        🔍 Ver
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <div class="date">
+
+                        📅
+                        ${escaparHTML(
+                            registro.fecha ||
+                            "Sin fecha"
+                        )}
+
+                    </div>
+
+
+                    <div class="monitor">
+
+                        👤
+                        ${escaparHTML(
+                            registro.monitor ||
+                            "Sin monitor"
+                        )}
+
+                    </div>
+
+
+                    <span class="frente">
+
+                        📍
+                        ${escaparHTML(
+                            registro.frente ||
+                            "Sin frente"
+                        )}
+
+                    </span>
+
+                </div>
+
+            `;
+
+
+            gallery.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ERROR DE IMAGEN
+========================================================= */
+
+function mostrarErrorImagen(
+    img
+) {
+
+    const container =
+        img.parentElement;
+
+
+    img.style.display =
+        "none";
+
+
+    const error =
+        document.createElement(
+            "div"
+        );
+
+
+    error.className =
+        "image-error";
+
+
+    error.innerHTML = `
+
+        <div
+            class="image-error-icon"
+        >
+            📷
+        </div>
+
+        <strong>
+            Imagen no disponible
+        </strong>
+
+        <small>
+            Verifica que el archivo
+            de Google Drive tenga
+            acceso público.
+        </small>
+
+    `;
+
+
+    container.appendChild(
+        error
+    );
+
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+document
+    .getElementById(
+        "fecha"
+    )
+    .addEventListener(
+        "change",
+        aplicarFiltros
+    );
+
+
+document
+    .getElementById(
+        "monitor"
+    )
+    .addEventListener(
+        "change",
+        aplicarFiltros
+    );
+
+
+document
+    .getElementById(
+        "frente"
+    )
+    .addEventListener(
+        "change",
+        aplicarFiltros
+    );
+
+
+function aplicarFiltros() {
+
+    const fecha =
+        document
+        .getElementById(
+            "fecha"
+        )
+        .value;
+
+
+    const monitor =
+        document
+        .getElementById(
+            "monitor"
+        )
+        .value;
+
+
+    const frente =
+        document
+        .getElementById(
+            "frente"
+        )
+        .value;
+
+
+    const filtrados =
+        datos.filter(
+            registro => {
+
+                const cumpleFecha =
+                    !fecha ||
+                    registro.fecha === fecha;
+
+
+                const cumpleMonitor =
+                    !monitor ||
+                    registro.monitor === monitor;
+
+
+                const cumpleFrente =
+                    !frente ||
+                    registro.frente === frente;
+
+
+                return (
+                    cumpleFecha &&
+                    cumpleMonitor &&
+                    cumpleFrente
+                );
+
+            }
+        );
+
+
+    mostrarGaleria(
+        filtrados
+    );
+
+}
+
+
+/* =========================================================
+   LIMPIAR FILTROS
+========================================================= */
+
+function limpiarFiltros() {
+
+    document
+        .getElementById(
+            "fecha"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "monitor"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "frente"
+        )
+        .value = "";
+
+
+    mostrarGaleria(
+        datos
+    );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function abrirModal(
+    url,
+    fecha,
+    monitor,
+    frente
+) {
+
+    const modal =
+        document.getElementById(
+            "modal"
+        );
+
+
+    const imagen =
+        document.getElementById(
+            "modalImage"
+        );
+
+
+    const info =
+        document.getElementById(
+            "modalInfo"
+        );
+
+
+    imagen.src =
+        url;
+
+
+    info.innerHTML = `
+
+        📅 ${fecha}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+        👤 ${monitor}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+        📍 ${frente}
+
+    `;
+
+
+    modal.classList.add(
+        "active"
+    );
+
+}
+
+
+/* =========================================================
+   CERRAR MODAL
+========================================================= */
+
+function cerrarModal() {
+
+    document
+        .getElementById(
+            "modal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "modalImage"
+        )
+        .src = "";
+
+}
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            cerrarModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SEGURIDAD HTML
+========================================================= */
+
+function escaparHTML(
+    texto
+) {
+
+    return String(texto)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escaparAtributo(
+    texto
+) {
+
+    return String(texto)
+
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+
+        .replace(
+            /'/g,
+            "\\'"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        );
+
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+cargarDatos();
+
+</script>
+
+
+{% endblock %}
+```
