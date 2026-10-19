@@ -558,3 +558,7 @@ def powerbi_mapa(request):
 def Panel_fotografico(request):
     return render(request, 'Panel.html')
 
+
+def Mostrar_reporte(request):
+    return render(request, 'Reportet2.html')
+
