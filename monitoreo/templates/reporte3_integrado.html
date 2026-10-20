@@ -1,0 +1,3295 @@
+```html
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Reporte de Monitoreo
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+
+/* =========================================================
+   CABECERA
+========================================================= */
+
+.reporte-header {
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e40af
+    );
+
+    color: white;
+    padding: 28px 35px;
+
+    box-shadow:
+        0 3px 10px rgba(0,0,0,.15);
+}
+
+.reporte-header-inner {
+    max-width: 1500px;
+    margin: auto;
+}
+
+.reporte-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.reporte-header p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    opacity: .85;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+========================================================= */
+
+.reporte-container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 25px;
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.filtros {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 25px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filtro-grupo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.filtro-grupo select {
+    width: 100%;
+    padding: 11px 12px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: white;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    outline: none;
+}
+
+.filtro-grupo select:focus {
+    border-color: #2563eb;
+}
+
+.filtro-botones {
+    display: flex;
+    align-items: end;
+    gap: 8px;
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.btn {
+    border: none;
+    border-radius: 8px;
+
+    padding:
+        11px 18px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: .2s;
+}
+
+.btn-actualizar {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-actualizar:hover {
+    background: #1d4ed8;
+}
+
+.btn-limpiar {
+    background: #475569;
+    color: white;
+}
+
+.btn-limpiar:hover {
+    background: #334155;
+}
+
+.btn-imprimir {
+    background: #059669;
+    color: white;
+}
+
+.btn-imprimir:hover {
+    background: #047857;
+}
+
+
+/* =========================================================
+   TITULO
+========================================================= */
+
+.titulo-seccion {
+    margin-bottom: 18px;
+}
+
+.titulo-seccion h2 {
+    margin: 0;
+
+    font-size: 21px;
+
+    color: #0f172a;
+}
+
+.titulo-seccion p {
+    margin:
+        5px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TARJETAS RESUMEN
+========================================================= */
+
+.resumen-cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+.resumen-card {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+}
+
+.resumen-card .titulo {
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.resumen-card .valor {
+    margin-top: 7px;
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    color: #1e3a8a;
+}
+
+.resumen-card .detalle {
+    margin-top: 3px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SECCIONES
+========================================================= */
+
+.seccion {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-bottom: 30px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+}
+
+.seccion-titulo {
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+}
+
+.seccion-titulo h3 {
+    margin: 0;
+
+    font-size: 18px;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.tabla-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-avance {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.tabla-avance thead th {
+    background: #0f172a;
+
+    color: white;
+
+    padding: 12px 10px;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.tabla-avance thead th:nth-child(3),
+.tabla-avance thead th:nth-child(4),
+.tabla-avance thead th:nth-child(5) {
+    text-align: right;
+}
+
+.tabla-avance tbody td {
+    padding: 11px 10px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+
+    vertical-align: middle;
+}
+
+.tabla-avance tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tabla-avance tbody td:nth-child(3),
+.tabla-avance tbody td:nth-child(4),
+.tabla-avance tbody td:nth-child(5) {
+    text-align: right;
+}
+
+.edt {
+    font-weight: 700;
+    color: #1e40af;
+}
+
+.tarea {
+    color: #334155;
+}
+
+
+/* =========================================================
+   AVANCE
+========================================================= */
+
+.avance-cell {
+    min-width: 130px;
+}
+
+.avance-numero {
+    display: flex;
+
+    justify-content:
+        flex-end;
+
+    font-size: 12px;
+
+    margin-bottom: 4px;
+}
+
+.barra {
+    width: 100%;
+
+    height: 7px;
+
+    background: #e5e7eb;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.barra-progreso {
+    height: 100%;
+
+    background: #2563eb;
+
+    border-radius: 20px;
+
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   PANEL FOTOGRÁFICO
+========================================================= */
+
+.galeria {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(280px, 1fr)
+        );
+
+    gap: 20px;
+}
+
+.foto-card {
+    background: white;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 10px rgba(0,0,0,.05);
+
+    transition:
+        transform .2s,
+        box-shadow .2s;
+}
+
+.foto-card:hover {
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.12);
+}
+
+.foto-imagen {
+    height: 220px;
+
+    background: #e2e8f0;
+
+    position: relative;
+
+    cursor: pointer;
+
+    overflow: hidden;
+}
+
+.foto-imagen img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform .3s;
+}
+
+.foto-card:hover
+.foto-imagen img {
+    transform:
+        scale(1.04);
+}
+
+.ver-foto {
+    position: absolute;
+
+    right: 10px;
+    bottom: 10px;
+
+    padding:
+        6px 10px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(0,0,0,.65);
+
+    color: white;
+
+    font-size: 11px;
+}
+
+.foto-info {
+    padding: 14px;
+}
+
+.foto-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+
+    margin-bottom: 8px;
+}
+
+.foto-badge {
+    display: inline-block;
+
+    padding:
+        4px 8px;
+
+    border-radius: 20px;
+
+    background: #eef2ff;
+
+    color: #4338ca;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+.foto-fecha {
+    font-size: 12px;
+
+    color: #64748b;
+
+    margin-bottom: 7px;
+}
+
+.foto-descripcion {
+    color: #475569;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   REGISTRO
+========================================================= */
+
+.registros-lista {
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.registro-texto {
+    padding: 2px 0;
+}
+
+.registros-vacio {
+    color: #64748b;
+    font-size: 13px;
+}
+
+
+/* SITUACIONES_INTEGRADAS */
+
+.situaciones-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.situacion-item {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.situacion-item:last-child {
+    border-bottom: none;
+}
+
+.situacion-aspecto {
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading {
+    text-align: center;
+
+    padding: 60px;
+
+    color: #64748b;
+}
+
+.spinner {
+    width: 42px;
+    height: 42px;
+
+    border:
+        4px solid #e5e7eb;
+
+    border-top-color:
+        #2563eb;
+
+    border-radius: 50%;
+
+    animation:
+        spin 1s linear infinite;
+
+    margin:
+        0 auto 15px;
+}
+
+@keyframes spin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,.90);
+
+    z-index: 9999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 30px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-contenido {
+    max-width: 1200px;
+    width: auto;
+
+    position: relative;
+}
+
+.modal-contenido img {
+    max-width: 100%;
+    max-height: 80vh;
+
+    display: block;
+
+    margin: auto;
+
+    border-radius: 8px;
+}
+
+.modal-cerrar {
+    position: absolute;
+
+    top: -15px;
+    right: -15px;
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: white;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+.modal-info {
+    margin-top: 10px;
+
+    padding: 10px 15px;
+
+    background:
+        rgba(0,0,0,.65);
+
+    color: white;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 1000px) {
+
+    .resumen-cards {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+@media(max-width: 800px) {
+
+    .filtros {
+        grid-template-columns:
+            1fr;
+    }
+
+    .filtro-botones {
+        align-items: stretch;
+    }
+
+}
+
+@media(max-width: 600px) {
+
+    .resumen-cards {
+        grid-template-columns:
+            1fr;
+    }
+
+    .reporte-header {
+        padding: 22px;
+    }
+
+    .reporte-container {
+        padding: 15px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =========================================================
+     CABECERA
+========================================================= -->
+
+<header class="reporte-header">
+
+    <div class="reporte-header-inner">
+
+        <h1>
+            📊 Reporte de Monitoreo
+        </h1>
+
+        <p>
+            Seguimiento de avance y panel fotográfico
+        </p>
+
+    </div>
+
+</header>
+
+
+<main class="reporte-container">
+
+
+    <!-- =====================================================
+         FILTROS
+    ====================================================== -->
+
+    <section class="filtros">
+
+        <div class="filtro-grupo">
+
+            <label>
+                📅 Semana
+            </label>
+
+            <select id="filtroSemana">
+
+                <option value="">
+                    Todas las semanas
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="filtro-grupo">
+
+            <label>
+                📍 QDA / Quebrada
+            </label>
+
+            <select id="filtroQda">
+
+                <option value="">
+                    Todas las QDA
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="filtro-botones">
+
+            <button
+                class="btn btn-limpiar"
+                onclick="limpiarFiltros()"
+            >
+                Limpiar
+            </button>
+
+
+            <button
+                class="btn btn-actualizar"
+                onclick="cargarDatos()"
+            >
+                🔄 Actualizar
+            </button>
+
+
+            <button
+                class="btn btn-imprimir"
+                onclick="window.print()"
+            >
+                🖨️ Imprimir
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TITULO
+    ====================================================== -->
+
+    <div class="titulo-seccion">
+
+        <h2 id="tituloReporte">
+            Reporte de Monitoreo
+        </h2>
+
+        <p id="subtituloReporte">
+            Seleccione una semana y una QDA.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         RESUMEN
+    ====================================================== -->
+
+    <section
+        class="resumen-cards"
+        id="resumenCards"
+    >
+
+        <div class="resumen-card">
+
+            <div class="titulo">
+                Presupuesto
+            </div>
+
+            <div
+                class="valor"
+                id="totalPtto"
+            >
+                0
+            </div>
+
+            <div class="detalle">
+                Monto PTTO
+            </div>
+
+        </div>
+
+
+        <div class="resumen-card">
+
+            <div class="titulo">
+                Monto ejecutado
+            </div>
+
+            <div
+                class="valor"
+                id="totalPttAvance"
+            >
+                0
+            </div>
+
+            <div class="detalle">
+                Monto PTTAVANCE
+            </div>
+
+        </div>
+
+
+        <div class="resumen-card">
+
+            <div class="titulo">
+                Avance físico
+            </div>
+
+            <div
+                class="valor"
+                id="avanceFisico"
+            >
+                0%
+            </div>
+
+            <div class="detalle">
+                PTTAVANCE / PTTO
+            </div>
+
+        </div>
+
+
+        <div class="resumen-card">
+
+            <div class="titulo">
+                Registros
+            </div>
+
+            <div
+                class="valor"
+                id="totalRegistros"
+            >
+                0
+            </div>
+
+            <div class="detalle">
+                Registros encontrados
+            </div>
+
+        </div>
+
+    </section>
+<!-- =====================================================
+         LOADING
+    ====================================================== -->
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <div>
+            Cargando información...
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLA
+    ====================================================== -->
+
+    <section class="seccion">
+
+        <div class="seccion-titulo">
+
+            <h3>
+                📋 Resumen de avance
+            </h3>
+
+        </div>
+
+
+        <div class="tabla-wrapper">
+
+            <table class="tabla-avance">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            EDT
+                        </th>
+
+                        <th>
+                            TAREA
+                        </th>
+
+                        <th>
+                            PTTO
+                        </th>
+
+                        <th>
+                            PTTAVANCE
+                        </th>
+
+                        <th>
+                            AVANCE FÍSICO
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaAvance">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- =====================================================
+         ASPECTOS Y SITUACIONES
+    ====================================================== -->
+
+    <section class="seccion">
+
+        <div class="seccion-titulo">
+            <h3>📌 Aspectos y situaciones</h3>
+        </div>
+
+        <div id="listaSituaciones" class="situaciones-lista"></div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         REGISTROS DE MONITOREO
+    ====================================================== -->
+
+    <section class="seccion">
+
+        <div class="seccion-titulo">
+            <h3>📝 Registro</h3>
+        </div>
+
+        <div id="listaRegistros" class="registros-lista"></div>
+
+    </section>
+
+
+
+
+
+    
+
+
+    <!-- =====================================================
+         PANEL FOTOGRÁFICO
+    ====================================================== -->
+
+    <section class="seccion">
+
+        <div class="seccion-titulo">
+
+            <h3>
+                📷 Panel fotográfico
+            </h3>
+
+        </div>
+
+
+        <div
+            id="galeria"
+            class="galeria"
+        ></div>
+
+
+        <div
+            id="sinFotos"
+            class="sin-datos"
+        >
+
+            <div class="sin-datos-icon">
+                📷
+            </div>
+
+            <strong>
+                No se encontraron fotografías
+            </strong>
+
+            <p>
+                No existen registros fotográficos
+                para la QDA y semana seleccionadas.
+            </p>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<!-- =========================================================
+     MODAL FOTOGRAFÍA
+========================================================= -->
+
+<div
+    id="modal"
+    class="modal"
+    onclick="cerrarModal()"
+>
+
+    <div
+        class="modal-contenido"
+        onclick="event.stopPropagation()"
+    >
+
+        <button
+            class="modal-cerrar"
+            onclick="cerrarModal()"
+        >
+            ×
+        </button>
+
+
+        <img
+            id="modalImagen"
+            src=""
+            alt="Fotografía"
+        >
+
+
+        <div
+            id="modalInfo"
+            class="modal-info"
+        ></div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   CONFIGURACIÓN DE GOOGLE SHEETS
+========================================================= */
+
+const SHEET_AVANCE_ID =
+    "1bLWRpU45n1lh_rhxivWfZ7QyeWNhPReBHC8Pw88FUiM";
+
+
+const SHEET_FOTOS_ID =
+    "1T-VxQhyrlGUqBLua7XNk4VoTjf_r2VtY";
+
+
+const SHEET_REGISTROS_ID =
+    "1BD8jI0TslZc9IN9XjBRSGsl5rQE5WlKBRyb4-g2qD9Y";
+
+
+const SHEET_SITUACIONES_ID =
+    "1XjrczAyTswEKZZEmErjNRK0B-UfeK7FLCyHTuX225XI";
+
+
+const SHEET_AVANCE_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_AVANCE_ID}/gviz/tq?tqx=out:csv`;
+
+
+const SHEET_FOTOS_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_FOTOS_ID}/gviz/tq?tqx=out:csv`;
+
+
+const SHEET_REGISTROS_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_REGISTROS_ID}/gviz/tq?tqx=out:csv`;
+
+
+const SHEET_SITUACIONES_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_SITUACIONES_ID}/gviz/tq?tqx=out:csv`;
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let datosAvance = [];
+
+let datosFotos = [];
+
+let datosAvanceOriginal = [];
+
+let datosFotosOriginal = [];
+
+
+/* =========================================================
+   EDT PERMITIDOS CUANDO SE MUESTRAN TODAS LAS QDA
+========================================================= */
+
+const EDTS_PERMITIDOS = [
+
+    "2.3.1",
+    "2.3.2",
+    "2.3.3",
+    "2.3.4",
+
+    "2.4.1",
+    "2.4.2",
+    "2.4.3",
+    "2.4.4",
+
+    "2.5.1",
+    "2.5.2",
+    "2.5.3",
+    "2.5.4"
+
+];
+
+
+/* =========================================================
+   CARGAR DATOS
+========================================================= */
+
+async function cargarDatos() {
+
+    mostrarLoading(true);
+
+    try {
+
+        const timestamp =
+            Date.now();
+
+
+        const [
+            respuestaAvance,
+            respuestaFotos,
+            respuestaRegistros,
+            respuestaSituaciones
+        ] = await Promise.all([
+
+            fetch(
+                SHEET_AVANCE_URL +
+                "&t=" +
+                timestamp
+            ),
+
+            fetch(
+                SHEET_FOTOS_URL +
+                "&t=" +
+                timestamp
+            ),
+
+            fetch(
+                SHEET_REGISTROS_URL +
+                "&t=" +
+                timestamp
+            ),
+
+            fetch(
+                SHEET_SITUACIONES_URL +
+                "&t=" +
+                timestamp
+            )
+
+        ]);
+
+
+        if (!respuestaAvance.ok) {
+
+            throw new Error(
+                "No se pudo acceder a la hoja de avance."
+            );
+
+        }
+
+
+        if (!respuestaFotos.ok) {
+
+            throw new Error(
+                "No se pudo acceder a la hoja fotográfica."
+            );
+
+        }
+
+        if (!respuestaRegistros.ok) {
+
+            throw new Error(
+                "No se pudo acceder a la hoja de registros."
+            );
+
+        }
+
+        if (!respuestaSituaciones.ok) {
+
+            throw new Error(
+                "No se pudo acceder a la hoja de aspectos y situaciones."
+            );
+
+        }
+
+
+        const csvAvance =
+            await respuestaAvance.text();
+
+
+        const csvFotos =
+            await respuestaFotos.text();
+
+
+        const csvRegistros =
+            await respuestaRegistros.text();
+
+
+        const csvSituaciones =
+            await respuestaSituaciones.text();
+
+
+        datosAvanceOriginal =
+            convertirCSV(
+                csvAvance
+            );
+
+
+        datosFotosOriginal =
+            convertirCSV(
+                csvFotos
+            );
+
+
+        datosRegistrosOriginal =
+            convertirCSV(
+                csvRegistros
+            );
+
+
+        datosSituacionesOriginal =
+            convertirCSV(
+                csvSituaciones
+            );
+
+
+        datosAvance =
+            datosAvanceOriginal;
+
+
+        datosFotos =
+            datosFotosOriginal;
+
+
+        datosRegistros =
+            datosRegistrosOriginal;
+
+
+        datosSituaciones =
+            datosSituacionesOriginal;
+
+
+        llenarFiltros();
+
+
+        seleccionarUltimaSemana();
+
+
+        aplicarFiltros();
+
+
+        mostrarLoading(false);
+
+    }
+
+    catch(error) {
+
+        console.error(error);
+
+
+        mostrarLoading(false);
+
+
+        document.getElementById(
+            "tablaAvance"
+        ).innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#b91c1c;
+                    "
+                >
+
+                    ⚠️ No se pudieron cargar
+                    los datos.
+
+                    <br><br>
+
+                    <small>
+                        ${escaparHTML(
+                            error.message
+                        )}
+                    </small>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   PARSER CSV
+========================================================= */
+
+function parseCSVLine(line) {
+
+    const resultado = [];
+
+    let actual = "";
+
+    let dentroComillas = false;
+
+
+    for (
+        let i = 0;
+        i < line.length;
+        i++
+    ) {
+
+        const caracter =
+            line[i];
+
+
+        if (
+            caracter === '"' &&
+            line[i + 1] === '"'
+        ) {
+
+            actual += '"';
+
+            i++;
+
+        }
+
+        else if (
+            caracter === '"'
+        ) {
+
+            dentroComillas =
+                !dentroComillas;
+
+        }
+
+        else if (
+            caracter === "," &&
+            !dentroComillas
+        ) {
+
+            resultado.push(
+                actual
+            );
+
+            actual = "";
+
+        }
+
+        else {
+
+            actual += caracter;
+
+        }
+
+    }
+
+
+    resultado.push(
+        actual
+    );
+
+
+    return resultado;
+
+}
+
+
+/* =========================================================
+   CONVERTIR CSV
+========================================================= */
+
+function convertirCSV(csv) {
+
+    const filas =
+        csv
+            .trim()
+            .split(/\r?\n/);
+
+
+    if (
+        filas.length < 2
+    ) {
+
+        return [];
+
+    }
+
+
+    const encabezados =
+        parseCSVLine(
+            filas[0]
+        )
+        .map(
+            normalizarNombre
+        );
+
+
+    return filas
+        .slice(1)
+        .map(
+            fila => {
+
+                const valores =
+                    parseCSVLine(
+                        fila
+                    );
+
+
+                const objeto = {};
+
+
+                encabezados.forEach(
+                    (
+                        encabezado,
+                        index
+                    ) => {
+
+                        objeto[
+                            encabezado
+                        ] =
+                            valores[index]
+                            ?
+                            valores[index].trim()
+                            :
+                            "";
+
+                    }
+                );
+
+
+                return objeto;
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   NORMALIZAR NOMBRE
+========================================================= */
+
+function normalizarNombre(
+    nombre
+) {
+
+    return String(nombre)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .replace(
+            /\s+/g,
+            "_"
+        );
+
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+function llenarFiltros() {
+
+    const semanas =
+        obtenerValores(
+            datosAvanceOriginal,
+            "semana"
+        );
+
+
+    const qdas =
+        obtenerValores(
+            datosAvanceOriginal,
+            "qda"
+        );
+
+
+    llenarSelect(
+        "filtroSemana",
+        semanas,
+        "Todas las semanas"
+    );
+
+
+    llenarSelect(
+        "filtroQda",
+        qdas,
+        "Todas las QDA"
+    );
+
+}
+
+
+/* =========================================================
+   OBTENER VALORES
+========================================================= */
+
+function obtenerValores(
+    datos,
+    campo
+) {
+
+    return [
+        ...new Set(
+
+            datos
+                .map(
+                    item =>
+                        limpiarValor(
+                            item[campo]
+                        )
+                )
+                .filter(
+                    valor =>
+                        valor !== ""
+                )
+
+        )
+    ].sort(
+        compararValores
+    );
+
+}
+
+
+/* =========================================================
+   LLENAR SELECT
+========================================================= */
+
+function llenarSelect(
+    id,
+    valores,
+    textoInicial
+) {
+
+    const select =
+        document.getElementById(
+            id
+        );
+
+
+    select.innerHTML = "";
+
+
+    const primera =
+        document.createElement(
+            "option"
+        );
+
+
+    primera.value = "";
+
+    primera.textContent =
+        textoInicial;
+
+
+    select.appendChild(
+        primera
+    );
+
+
+    valores.forEach(
+        valor => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                valor;
+
+            option.textContent =
+                valor;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SELECCIONAR ÚLTIMA SEMANA
+========================================================= */
+
+function seleccionarUltimaSemana() {
+
+    const semanas =
+        obtenerValores(
+            datosAvanceOriginal,
+            "semana"
+        );
+
+
+    if (
+        semanas.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "filtroSemana"
+    ).value =
+        semanas[
+            semanas.length - 1
+        ];
+
+}
+
+
+/* =========================================================
+   APLICAR FILTROS
+========================================================= */
+
+function aplicarFiltros() {
+
+    const semana =
+        document.getElementById(
+            "filtroSemana"
+        ).value.trim();
+
+
+    const qda =
+        document.getElementById(
+            "filtroQda"
+        ).value.trim();
+
+
+    /*
+    =========================================================
+    FILTRAR DATOS DE AVANCE
+    =========================================================
+    */
+
+    datosAvance =
+        datosAvanceOriginal.filter(
+            registro => {
+
+                const semanaRegistro =
+                    limpiarValor(
+                        registro.semana
+                    );
+
+
+                const qdaRegistro =
+                    limpiarValor(
+                        registro.qda
+                    );
+
+
+                /*
+                Si se seleccionó una semana,
+                debe coincidir.
+                */
+
+                const cumpleSemana =
+                    !semana ||
+                    semanaRegistro.toLowerCase() ===
+                    semana.toLowerCase();
+
+
+                /*
+                Si se seleccionó una QDA,
+                debe coincidir.
+                */
+
+                const cumpleQda =
+                    !qda ||
+                    qdaRegistro.toLowerCase() ===
+                    qda.toLowerCase();
+
+
+                return (
+                    cumpleSemana &&
+                    cumpleQda
+                );
+
+            }
+        );
+
+
+    /*
+    =========================================================
+    FILTRAR FOTOGRAFÍAS
+    =========================================================
+    */
+
+    datosFotos =
+        datosFotosOriginal.filter(
+            registro => {
+
+                const semanaRegistro =
+                    limpiarValor(
+                        registro.semana
+                    );
+
+
+                const qdaFoto =
+                    limpiarValor(
+                        registro.qba
+                    );
+
+
+                const cumpleSemana =
+                    !semana ||
+                    semanaRegistro.toLowerCase() ===
+                    semana.toLowerCase();
+
+
+                const cumpleQda =
+                    !qda ||
+                    qdaFoto.toLowerCase() ===
+                    qda.toLowerCase();
+
+
+                return (
+                    cumpleSemana &&
+                    cumpleQda
+                );
+
+            }
+        );
+
+
+    /*
+    =========================================================
+    ACTUALIZAR INTERFAZ
+    =========================================================
+    */
+
+    /*
+     =========================================================
+     FILTRAR REGISTROS DE LA NUEVA HOJA
+
+     Columnas: semana | QBA | registro
+     =========================================================
+    */
+
+    datosRegistros =
+        datosRegistrosOriginal.filter(
+            registro => {
+
+                const semanaRegistro =
+                    limpiarValor(registro.semana);
+
+                const qbaRegistro =
+                    limpiarValor(registro.qba);
+
+                const cumpleSemana =
+                    !semana ||
+                    semanaRegistro.toLowerCase() ===
+                    semana.toLowerCase();
+
+                const cumpleQba =
+                    !qda ||
+                    qbaRegistro.toLowerCase() ===
+                    qda.toLowerCase();
+
+                return (
+                    cumpleSemana &&
+                    cumpleQba &&
+                    limpiarValor(registro.registro) !== ""
+                );
+
+            }
+        );
+
+
+    /*
+     =========================================================
+     FILTRAR ASPECTOS Y SITUACIONES
+     =========================================================
+    */
+
+    datosSituaciones =
+        datosSituacionesOriginal.filter(
+            registro => {
+
+                const semanaRegistro =
+                    limpiarValor(registro.semana);
+
+                const qdaRegistro =
+                    limpiarValor(registro.qda);
+
+                const cumpleSemana =
+                    !semana ||
+                    semanaRegistro.toLowerCase() ===
+                    semana.toLowerCase();
+
+                const cumpleQda =
+                    !qda ||
+                    qdaRegistro.toLowerCase() ===
+                    qda.toLowerCase();
+
+                return (
+                    cumpleSemana &&
+                    cumpleQda &&
+                    (
+                        limpiarValor(registro.aspecto) !== "" ||
+                        limpiarValor(registro.situacion) !== ""
+                    )
+                );
+            }
+        );
+
+
+    actualizarTitulo(
+        semana,
+        qda
+    );
+
+
+    mostrarResumen();
+
+
+    mostrarTabla();
+
+
+    mostrarFotografias();
+
+
+    mostrarRegistros();
+
+
+    mostrarSituaciones();
+
+}
+
+/* =========================================================
+   ACTUALIZAR TÍTULO
+========================================================= */
+
+function actualizarTitulo(
+    semana,
+    qda
+) {
+
+    let titulo =
+        "Reporte de Monitoreo";
+
+
+    let subtitulo = "";
+
+
+    if (semana) {
+
+        titulo +=
+            ` — Semana ${semana}`;
+
+        subtitulo =
+            `Semana ${semana}`;
+
+    }
+
+
+    if (qda) {
+
+        titulo +=
+            ` — ${qda}`;
+
+        subtitulo +=
+            subtitulo
+            ? ` | ${qda}`
+            : qda;
+
+    }
+
+
+    if (!subtitulo) {
+
+        subtitulo =
+            "Resumen general";
+
+    }
+
+
+    document.getElementById(
+        "tituloReporte"
+    ).textContent =
+        titulo;
+
+
+    document.getElementById(
+        "subtituloReporte"
+    ).textContent =
+        subtitulo;
+
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+function mostrarResumen() {
+
+    let totalPtto = 0;
+
+    let totalPttAvance = 0;
+
+
+    datosAvance.forEach(
+        registro => {
+
+            totalPtto +=
+                numero(
+                    registro.ptto
+                )/2;
+
+
+            totalPttAvance +=
+                numero(
+                    registro.pttavance
+                )/2;
+
+        }
+    );
+
+
+    let avanceFisico = 0;
+
+
+    if (
+        totalPtto > 0
+    ) {
+
+        avanceFisico =
+            (
+                totalPttAvance /
+                totalPtto
+            ) * 100;
+
+    }
+
+
+    document.getElementById(
+        "totalPtto"
+    ).textContent =
+        formatearNumero(
+            totalPtto
+        );
+
+
+    document.getElementById(
+        "totalPttAvance"
+    ).textContent =
+        formatearNumero(
+            totalPttAvance
+        );
+
+
+    document.getElementById(
+        "avanceFisico"
+    ).textContent =
+        formatearPorcentaje(
+            avanceFisico
+        );
+
+
+    document.getElementById(
+        "totalRegistros"
+    ).textContent =
+        datosAvance.length;
+
+}
+
+
+/* =========================================================
+   TABLA
+
+   IMPORTANTE:
+
+   NO SE CONSOLIDA.
+
+   CADA REGISTRO DE LA HOJA ES UNA FILA.
+
+   CUANDO QDA = TODAS:
+   SOLO SE MUESTRAN LOS 12 EDT PERMITIDOS.
+
+   CUANDO QDA = UNA QDA:
+   SE MUESTRAN TODOS SUS REGISTROS.
+========================================================= */
+
+function mostrarTabla() {
+
+    const tbody =
+        document.getElementById(
+            "tablaAvance"
+        );
+
+
+    tbody.innerHTML = "";
+
+
+    if (
+        !datosAvance ||
+        datosAvance.length === 0
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    style="
+                        text-align:center;
+                        padding:40px;
+                        color:#64748b;
+                    "
+                >
+
+                    No existen registros
+                    para los filtros seleccionados.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    const qdaSeleccionada =
+        document.getElementById(
+            "filtroQda"
+        ).value;
+
+
+    let registrosMostrar;
+
+
+    /*
+    =========================================================
+    TODAS LAS QDA
+
+    FILTRAR ÚNICAMENTE LOS EDT INDICADOS
+    =========================================================
+    */
+
+    if (!qdaSeleccionada) {
+
+        registrosMostrar =
+            datosAvance.filter(
+                registro => {
+
+                    const edt =
+                        limpiarValor(
+                            registro.edt
+                        );
+
+
+                    return EDTS_PERMITIDOS.includes(
+                        edt
+                    );
+
+                }
+            );
+
+    }
+
+
+    /*
+    =========================================================
+    QDA ESPECÍFICA
+
+    MOSTRAR TODOS LOS REGISTROS
+    =========================================================
+    */
+
+    else {
+
+        registrosMostrar =
+            datosAvance;
+
+    }
+
+
+    /*
+    =========================================================
+    ORDENAR POR EDT
+
+    NO AGRUPAR.
+    NO CONSOLIDAR.
+    =========================================================
+    */
+
+    registrosMostrar.sort(
+        (a, b) => {
+
+            const ordenEDT =
+                compararValores(
+                    a.edt || "",
+                    b.edt || ""
+                );
+
+
+            if (
+                ordenEDT !== 0
+            ) {
+
+                return ordenEDT;
+
+            }
+
+
+            return compararValores(
+                a.tarea || "",
+                b.tarea || ""
+            );
+
+        }
+    );
+
+
+    /*
+    =========================================================
+    CREAR UNA FILA POR CADA REGISTRO
+    =========================================================
+    */
+
+    registrosMostrar.forEach(
+        registro => {
+
+            const ptto =
+                numero(
+                    registro.ptto
+                );
+
+
+            const pttavance =
+                numero(
+                    registro.pttavance
+                );
+
+
+            /*
+            AVANCE FÍSICO
+
+            PTTAVANCE / PTTO × 100
+            */
+
+            let avanceFisico = 0;
+
+
+            if (
+                ptto > 0
+            ) {
+
+                avanceFisico =
+                    (
+                        pttavance /
+                        ptto
+                    ) * 100;
+
+            }
+
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            tr.innerHTML = `
+
+                <td>
+
+                    <span class="edt">
+
+                        ${escaparHTML(
+                            registro.edt || "-"
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span class="tarea">
+
+                        ${escaparHTML(
+                            registro.tarea || "-"
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    ${formatearNumero(
+                        ptto
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${formatearNumero(
+                        pttavance
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    <div
+                        class="avance-cell"
+                    >
+
+                        <div
+                            class="avance-numero"
+                        >
+
+                            ${formatearPorcentaje(
+                                avanceFisico
+                            )}
+
+                        </div>
+
+
+                        <div class="barra">
+
+                            <div
+                                class="barra-progreso"
+                                style="
+                                    width:${limitar(
+                                        avanceFisico
+                                    )}%;
+                                "
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+            `;
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        }
+    );
+
+
+    /*
+    =========================================================
+    SIN RESULTADOS DESPUÉS DEL FILTRO EDT
+    =========================================================
+    */
+
+    if (
+        registrosMostrar.length === 0
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    style="
+                        text-align:center;
+                        padding:40px;
+                        color:#64748b;
+                    "
+                >
+
+                    No existen registros con
+                    los EDT seleccionados.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   PANEL FOTOGRÁFICO
+========================================================= */
+
+function mostrarRegistros() {
+
+    const contenedor =
+        document.getElementById("listaRegistros");
+
+    contenedor.innerHTML = "";
+
+    if (!datosRegistros || datosRegistros.length === 0) {
+        return;
+    }
+
+    datosRegistros.forEach(
+        registro => {
+
+            const texto =
+                limpiarValor(
+                    registro.registro
+                );
+
+            if (!texto) {
+                return;
+            }
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "registro-texto";
+
+            item.textContent =
+                texto;
+
+            contenedor.appendChild(item);
+
+        }
+    );
+}
+
+
+function mostrarSituaciones() {
+
+    const contenedor =
+        document.getElementById(
+            "listaSituaciones"
+        );
+
+    contenedor.innerHTML = "";
+
+    if (
+        !datosSituaciones ||
+        datosSituaciones.length === 0
+    ) {
+        return;
+    }
+
+    datosSituaciones.forEach(
+        registro => {
+
+            const aspecto =
+                limpiarValor(
+                    registro.aspecto
+                );
+
+            const situacion =
+                limpiarValor(
+                    registro.situacion
+                );
+
+            if (!aspecto && !situacion) {
+                return;
+            }
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "situacion-item";
+
+            item.innerHTML = `
+                <span class="situacion-aspecto">
+                    ${escaparHTML(aspecto || "Aspecto")}:
+                </span>
+                ${escaparHTML(situacion || "-")}
+            `;
+
+            contenedor.appendChild(item);
+        }
+    );
+}
+
+
+function mostrarFotografias() {
+
+    const galeria =
+        document.getElementById(
+            "galeria"
+        );
+
+
+    const sinFotos =
+        document.getElementById(
+            "sinFotos"
+        );
+
+
+    galeria.innerHTML = "";
+
+
+    if (
+        datosFotos.length === 0
+    ) {
+
+        sinFotos.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    sinFotos.style.display =
+        "none";
+
+
+    datosFotos.forEach(
+        foto => {
+
+            const imagen =
+                convertirLinkImagen(
+                    foto.enlace
+                );
+
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "foto-card";
+
+
+            card.innerHTML = `
+
+                <div
+                    class="foto-imagen"
+
+                    onclick="abrirModal(
+                        '${escaparAtributo(
+                            imagen
+                        )}',
+                        '${escaparAtributo(
+                            foto.qba || ''
+                        )}',
+                        '${escaparAtributo(
+                            foto.semana || ''
+                        )}',
+                        '${escaparAtributo(
+                            foto.fecha || ''
+                        )}',
+                        '${escaparAtributo(
+                            foto.descripcion || ''
+                        )}'
+                    )"
+                >
+
+                    <img
+                        src="${escaparAtributo(
+                            imagen
+                        )}"
+
+                        alt="Fotografía de monitoreo"
+
+                        loading="lazy"
+
+                        onerror="
+                            mostrarErrorImagen(this)
+                        "
+                    >
+
+                    <span class="ver-foto">
+                        🔍 Ver fotografía
+                    </span>
+
+                </div>
+
+
+                <div class="foto-info">
+
+                    <div class="foto-meta">
+
+                        <span class="foto-badge">
+
+                            📍
+                            ${escaparHTML(
+                                foto.qba || "-"
+                            )}
+
+                        </span>
+
+
+                        <span class="foto-badge">
+
+                            Semana
+                            ${escaparHTML(
+                                foto.semana || "-"
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="foto-fecha">
+
+                        📅
+                        ${escaparHTML(
+                            foto.fecha ||
+                            "Sin fecha"
+                        )}
+
+                    </div>
+
+
+                    <div class="foto-descripcion">
+
+                        ${escaparHTML(
+                            foto.descripcion ||
+                            "Sin descripción"
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            galeria.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CONVERTIR LINK DE GOOGLE DRIVE
+========================================================= */
+
+function convertirLinkImagen(
+    url
+) {
+
+    if (!url) {
+
+        return "";
+
+    }
+
+
+    url =
+        url.trim();
+
+
+    let match =
+        url.match(
+            /drive\.google\.com\/file\/d\/([^/?]+)/i
+        );
+
+
+    if (match) {
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(
+                match[1]
+            ) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    match =
+        url.match(
+            /drive\.google\.com\/open\?id=([^&]+)/i
+        );
+
+
+    if (match) {
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(
+                match[1]
+            ) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    match =
+        url.match(
+            /drive\.google\.com\/uc\?.*id=([^&]+)/i
+        );
+
+
+    if (match) {
+
+        return (
+            "https://drive.google.com/thumbnail" +
+            "?id=" +
+            encodeURIComponent(
+                match[1]
+            ) +
+            "&sz=w1200"
+        );
+
+    }
+
+
+    return url;
+
+}
+
+
+/* =========================================================
+   ERROR DE IMAGEN
+========================================================= */
+
+function mostrarErrorImagen(
+    img
+) {
+
+    const container =
+        img.parentElement;
+
+
+    img.style.display =
+        "none";
+
+
+    const error =
+        document.createElement(
+            "div"
+        );
+
+
+    error.style.cssText = `
+        width:100%;
+        height:100%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        color:#64748b;
+        background:#e2e8f0;
+        text-align:center;
+        padding:20px;
+    `;
+
+
+    error.innerHTML = `
+
+        <div
+            style="
+                font-size:40px;
+                margin-bottom:8px;
+            "
+        >
+            📷
+        </div>
+
+        <strong>
+            Imagen no disponible
+        </strong>
+
+        <small>
+            Verifique el acceso del archivo.
+        </small>
+
+    `;
+
+
+    container.appendChild(
+        error
+    );
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function abrirModal(
+    url,
+    qba,
+    semana,
+    fecha,
+    descripcion
+) {
+
+    document.getElementById(
+        "modalImagen"
+    ).src =
+        url;
+
+
+    document.getElementById(
+        "modalInfo"
+    ).innerHTML = `
+
+        📍
+
+        <strong>
+            ${escaparHTML(qba)}
+        </strong>
+
+        &nbsp; | &nbsp;
+
+        📅 Semana
+        ${escaparHTML(semana)}
+
+        &nbsp; | &nbsp;
+
+        ${escaparHTML(fecha)}
+
+        <br>
+
+        📝
+        ${escaparHTML(
+            descripcion
+        )}
+
+    `;
+
+
+    document.getElementById(
+        "modal"
+    ).classList.add(
+        "active"
+    );
+
+}
+
+
+function cerrarModal() {
+
+    document.getElementById(
+        "modal"
+    ).classList.remove(
+        "active"
+    );
+
+
+    document.getElementById(
+        "modalImagen"
+    ).src = "";
+
+}
+
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            cerrarModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LIMPIAR FILTROS
+========================================================= */
+
+function limpiarFiltros() {
+
+    document.getElementById(
+        "filtroSemana"
+    ).value = "";
+
+
+    document.getElementById(
+        "filtroQda"
+    ).value = "";
+
+
+    aplicarFiltros();
+
+}
+
+
+/* =========================================================
+   CONVERTIR NÚMERO
+========================================================= */
+
+function numero(
+    valor
+) {
+
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === ""
+    ) {
+
+        return 0;
+
+    }
+
+
+    let texto =
+        String(valor)
+            .trim();
+
+
+    texto =
+        texto.replace(
+            /%/g,
+            ""
+        );
+
+
+    texto =
+        texto.replace(
+            /\s/g,
+            ""
+        );
+
+
+    if (
+        texto.includes(".") &&
+        texto.includes(",")
+    ) {
+
+        if (
+            texto.lastIndexOf(",") >
+            texto.lastIndexOf(".")
+        ) {
+
+            texto =
+                texto
+                    .replace(
+                        /\./g,
+                        ""
+                    )
+                    .replace(
+                        ",",
+                        "."
+                    );
+
+        }
+
+        else {
+
+            texto =
+                texto.replace(
+                    /,/g,
+                    ""
+                );
+
+        }
+
+    }
+
+    else if (
+        texto.includes(",")
+    ) {
+
+        texto =
+            texto.replace(
+                ",",
+                "."
+            );
+
+    }
+
+
+    const resultado =
+        parseFloat(
+            texto
+        );
+
+
+    return isNaN(
+        resultado
+    )
+    ? 0
+    : resultado;
+
+}
+
+
+/* =========================================================
+   FORMATEAR NÚMERO
+========================================================= */
+
+function formatearNumero(
+    valor
+) {
+
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "es-PE",
+        {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FORMATEAR PORCENTAJE
+========================================================= */
+
+function formatearPorcentaje(
+    valor
+) {
+
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "es-PE",
+        {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }
+    ) + "%";
+
+}
+
+
+/* =========================================================
+   LIMITAR BARRA
+========================================================= */
+
+function limitar(
+    valor
+) {
+
+    return Math.max(
+        0,
+        Math.min(
+            100,
+            Number(valor) || 0
+        )
+    );
+
+}
+
+
+/* =========================================================
+   COMPARAR
+========================================================= */
+
+function comparar(
+    a,
+    b
+) {
+
+    return limpiarValor(a)
+        .toLowerCase() ===
+        limpiarValor(b)
+            .toLowerCase();
+
+}
+
+
+/* =========================================================
+   ORDENAR
+========================================================= */
+
+function compararValores(
+    a,
+    b
+) {
+
+    return String(a).localeCompare(
+        String(b),
+        "es",
+        {
+            numeric: true,
+            sensitivity: "base"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LIMPIAR VALOR
+========================================================= */
+
+function limpiarValor(
+    valor
+) {
+
+    return String(
+        valor || ""
+    ).trim();
+
+}
+
+
+/* =========================================================
+   ESCAPAR HTML
+========================================================= */
+
+function escaparHTML(
+    texto
+) {
+
+    return String(
+        texto || ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   ESCAPAR ATRIBUTO
+========================================================= */
+
+function escaparAtributo(
+    texto
+) {
+
+    return String(
+        texto || ""
+    )
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+        .replace(
+            /'/g,
+            "\\'"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        );
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function mostrarLoading(
+    mostrar
+) {
+
+    document.getElementById(
+        "loading"
+    ).style.display =
+        mostrar
+        ? "block"
+        : "none";
+
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+/* =========================================================
+   EVENTOS DE LOS FILTROS
+========================================================= */
+
+document.getElementById("filtroSemana")
+    .addEventListener("change", function() {
+
+        aplicarFiltros();
+
+    });
+
+
+document.getElementById("filtroQda")
+    .addEventListener("change", function() {
+
+        aplicarFiltros();
+
+    });
+
+
+/* =========================================================
+   CARGAR DATOS AL INICIAR
+========================================================= */
+
+cargarDatos();
+
+</script>
+
+{% endblock %}
+```

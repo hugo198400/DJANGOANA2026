@@ -563,5 +563,5 @@ def Panel_fotografico(request):
  #   return render(request, 'Reportet2.html')
 
 def Mostrar_reporte(request):
-    return render(request, 'reporte3.html')
+    return render(request, 'reporte3_final.html')
 
